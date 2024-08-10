@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'http://localhost:8080'; // 您的基础 URL
+const baseUrl = 'http://192.168.10.23:8080'; // 您的基础 URL
 
 const axiosInstance = axios.create({
     baseURL: baseUrl,
