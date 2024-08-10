@@ -1,8 +1,11 @@
-import React, { lazy } from "react";
-import { Navigate } from "react-router-dom";
+import React, {lazy} from "react";
+import {Navigate} from "react-router-dom";
 
-const One = lazy(() => import("../page/One"));
 const Login = lazy(() => import("../page/Login"));
+const Update = lazy(() => import("../page/Update"))
+const Main = lazy(() => import("../page/Main"))
+const Register = lazy(() => import("../page/Register"))
+
 const withLoadingComponent = (comp) => (
     <React.Suspense fallback={<div>loading...</div>}>
         {comp}
@@ -10,40 +13,32 @@ const withLoadingComponent = (comp) => (
 );
 
 const routes = [
-    {
-        path: "/",
-        element: <Navigate to="/login" />,
-    },
-    {
-        path: "/login",
-        element: withLoadingComponent(<Login />),
-        // children: [
-        //     {
-        //         path: "pageOne",
-        //         element: withLoadingComponent(<One />),
-        //     },
-        //     {
-        //         path: "pageTwo",
-        //         element: withLoadingComponent(<Two />),
-        //     },
-        //     {
-        //         path: "about",
-        //         element: withLoadingComponent(<About />),
-        //     },
-        //     {
-        //         path: "sub1/teamOne",
-        //         element: withLoadingComponent(<TeamOne />),
-        //     },
-        //     {
-        //         path: "*",
-        //         element: withLoadingComponent(<One />),
-        //     },
-        // ],
-    },
-    {
-        path: "one",
-        element: <One />,
-    },
-];
+        {
+            path: "/",
+            element: <Navigate to="/login"/>
+        },
+        {
+            path: "/login",
+            element: withLoadingComponent(<Login/>)
+            // children: [
+            //     {
+            //         path: "pageOne",
+            //         element: withLoadingComponent(<One />),
+            //     },
+        },
+        {
+            path: "/update",
+            element: withLoadingComponent(<Update/>)
+        },
+        {
+            path: "/main",
+            element: withLoadingComponent(<Main/>)
+        },
+        {
+            path: "/register",
+            element: withLoadingComponent(<Register/>)
+        }
+    ]
+;
 
 export default routes;
