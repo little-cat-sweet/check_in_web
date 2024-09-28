@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import httpUtil from '../../util/HttpUtil';
 
-const Index = () => {
+const Login = () => {
 
     const [isMessageInitialized, setMessageInitialized] = useState(false);
     const [email, updateEmail] = useState("")
@@ -113,4 +113,4 @@ const Index = () => {
     );
 };
 
-export default Index;
+export default Login;

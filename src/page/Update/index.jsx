@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import httpUtil from '../../util/HttpUtil';
 
 
-const Index = () => {
+const Update = () => {
 
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -131,4 +131,4 @@ const Index = () => {
     );
 };
 
-export default Index;
+export default Update;

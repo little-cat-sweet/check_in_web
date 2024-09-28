@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import httpUtil from '../../util/HttpUtil';
 
-const Index = () => {
+const Register = () => {
 
     const [form] = Form.useForm();
 
@@ -153,4 +153,4 @@ const Index = () => {
     );
 };
 
-export default Index;
+export default Register;
