@@ -41,7 +41,7 @@ const Login = () => {
     const login = async () => {
         let data = null;
         try {
-            data = await httpUtil.postRequest("/user/login?email=" + email + "&password=" + password, null);
+            data = await httpUtil.postRequest('/user/login?email=' + email + '&password=' + password, null);
             if (data.success === true) {
                 localStorage.setItem("authorization", data.data)
                 message.info("login success !")

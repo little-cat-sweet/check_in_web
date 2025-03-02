@@ -20,11 +20,6 @@ const routes = [
         {
             path: "/login",
             element: withLoadingComponent(<Login/>)
-            // children: [
-            //     {
-            //         path: "pageOne",
-            //         element: withLoadingComponent(<One />),
-            //     },
         },
         {
             path: "/update",
