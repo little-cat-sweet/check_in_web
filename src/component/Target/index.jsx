@@ -2,7 +2,6 @@ import {useEffect, useState} from "react";
 import httpUtil from "../../util/HttpUtil";
 import {Button, Col, Flex, Input, Layout, message, Modal, Row, Select, Table} from "antd";
 import {Content, Header} from "antd/es/layout/layout";
-import {Footer} from "antd/es/modal/shared";
 
 const headerStyle = {
     textAlign: 'center',

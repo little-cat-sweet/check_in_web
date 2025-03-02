@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import httpUtil from "../../util/HttpUtil";
-import dateUtil from "../../util/DateUtil"
-import {message, Space, Table} from 'antd';
+import dateUtil from "../../util/DateUtil";
+import { message, Space, Table } from 'antd';
 
 const columns = (handleConfirmComplete, cancel) => [
     {
         title: 'Name',
         dataIndex: 'name',
         key: 'name',
-        render: (text) =>{return text},
+        render: (text) => text,
     },
     {
         title: 'Description',
@@ -38,11 +38,16 @@ const columns = (handleConfirmComplete, cancel) => [
         ),
     },
 ];
+
 const TargetItemContainer = () => {
     const [targetItems, setTargetItems] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(6);
+    const [total, setTotal] = useState(0);
 
     const getTargetItemsByTime = async (time) => {
-        return await httpUtil.getRequest('/targetItem/showTargetItemVo' + '?time=' + time);
+        const url = `/targetItem/showTargetItemVo?time=${time}&pageNum=${currentPage}&pageSize=${pageSize}`;
+        return await httpUtil.getRequest(url);
     };
 
     const handleConfirmComplete = async (id) => {
@@ -50,39 +55,44 @@ const TargetItemContainer = () => {
         if (res.success) {
             await flushTargetItems();
         } else {
-            message.error("confirm failed.")
+            message.error("confirm failed.");
         }
-    }
+    };
 
     const cancel = async (id) => {
         const res = await httpUtil.postRequest('/targetItem/cancel?id=' + id);
-        console.log(JSON.stringify(res))
         if (res.success) {
-            await flushTargetItems()
+            await flushTargetItems();
         } else {
-            message.error("cancel failed.")
+            message.error("cancel failed.");
         }
-    }
+    };
 
     const flushTargetItems = async () => {
         const time = await dateUtil.getNowDate();
-        const res = await getTargetItemsByTime(time)
+        const res = await getTargetItemsByTime(time);
         if (res.success) {
-            setTargetItems(res.data)
+            setTargetItems(res.data);
+            setTotal(res.pagination.total);
         } else {
-            message.error("fetch error")
+            message.error("fetch error");
         }
-    }
+    };
 
+    const handleTableChange = (pagination) => {
+        setCurrentPage(pagination.current);
+        setPageSize(pagination.pageSize);
+        flushTargetItems();
+    };
 
     useEffect(() => {
         const fetchDate = async () => {
             try {
                 const time = await dateUtil.getNowDate();
-                const res = await getTargetItemsByTime(time)
-                const items = await res.data
-                if (items != null) {
-                    setTargetItems(items);
+                const res = await getTargetItemsByTime(time);
+                if (res.success) {
+                    setTargetItems(res.data);
+                    setTotal(res.pagination.total);
                 }
             } catch (error) {
                 console.error("Error fetching date:", error);
@@ -91,9 +101,26 @@ const TargetItemContainer = () => {
         fetchDate();
     }, []);
 
+    const paginationConfig = {
+        current: currentPage,
+        pageSize: pageSize,
+        total: total,
+        onChange: handleTableChange,
+        onShowSizeChange: (current, size) => {
+            setCurrentPage(current);
+            setPageSize(size);
+            flushTargetItems();
+        },
+    };
+
     return (
         <div>
-            <Table columns={columns(handleConfirmComplete, cancel)} dataSource={targetItems} rowKey="id"/>
+            <Table
+                columns={columns(handleConfirmComplete, cancel)}
+                dataSource={targetItems}
+                rowKey="id"
+                pagination={paginationConfig}
+            />
         </div>
     );
 };
