@@ -1,0 +1,45 @@
+/* 根据需要调整选择器名称 */
+.date-cell.has-incomplete-items {
+    background-color: rgba(255, 0, 0, 0.1); /* 轻微的红色背景表示有未完成项目 */
+}
+
+.incomplete-item {
+    background-color: red; /* 或者任何你希望使用的红色调 */
+    color: white; /* 确保文字颜色与背景形成对比 */
+}
+
+.date-cell p {
+    text-align: center; /* 居中文本 */
+}
+
+/* 如果需要垂直居中，可以考虑设置行高与容器高度相同 */
+.date-cell li {
+    list-style-type: none; /* 移除列表项的默认样式 */
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
+
+.center-text p {
+    text-align: center;
+    margin-bottom: 10px; /* 调整这个值以增加或减少间距 */
+}
+
+.center-text p:last-child {
+    border-bottom: 1px solid #000; /* 分割线颜色和粗细 */
+    padding-bottom: 5px; /* 可选：给分割线下方留出一些空间 */
+}
+
+.notes-month {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.notes-month section {
+    margin-bottom: 5px; /* 根据需要调整间距 */
+}

@@ -1,34 +1,33 @@
-import React, {useState} from 'react';
-import {UploadOutlined, UserOutlined} from '@ant-design/icons';
-import {Layout, Menu, theme} from 'antd';
+import React, { useState } from 'react';
+import { UploadOutlined, UserOutlined } from '@ant-design/icons';
+import { Layout, Menu, theme } from 'antd';
 import Target from "../../component/Target";
 import Conclusion from "../../component/Conclusion";
 import TargetItemContainer from "../../component/TargetItemContainer";
 
-const {Content, Footer, Sider} = Layout;
+const { Content, Footer, Sider } = Layout;
 
 const items = [
     {
         key: '1',
-        icon: <UserOutlined/>,
+        icon: <UserOutlined />,
         label: 'Targets',
     },
     {
         key: '2',
-        icon: <UploadOutlined/>,
+        icon: <UploadOutlined />,
         label: 'Target Config',
     },
     {
         key: '3',
-        icon: <UploadOutlined/>,
+        icon: <UploadOutlined />,
         label: 'Conclusion',
     }
-
 ];
 
 const Main = () => {
     const {
-        token: {colorBgContainer, borderRadiusLG},
+        token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
     const [selectedKey, setSelectedKey] = useState('1');
@@ -39,17 +38,17 @@ const Main = () => {
     const renderContent = () => {
         switch (selectedKey) {
             case '1':
-                return <TargetItemContainer/>;
-            case '2' :
-                return <Target/>
+                return <TargetItemContainer />;
+            case '2':
+                return <Target />;
             case '3':
-                return <Conclusion/>;
+                return <Conclusion />;
             default:
                 return null;
         }
     };
     return (
-        <Layout>
+        <Layout style={{ minHeight: '100vh' }}>
             <Sider
                 breakpoint="lg"
                 collapsedWidth="0"
@@ -60,13 +59,14 @@ const Main = () => {
                     console.log(collapsed, type);
                 }}
             >
-                <div className="demo-logo-vertical"/>
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} onClick={handleMenuClick}/>
+                <div className="demo-logo-vertical" />
+                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} onClick={handleMenuClick} />
             </Sider>
             <Layout>
                 <Content
                     style={{
                         margin: '24px 16px 0',
+                        minHeight: 'calc(100vh - 100px)'
                     }}
                 >
                     <div
