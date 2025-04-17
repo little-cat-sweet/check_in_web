@@ -9,27 +9,26 @@
 }
 
 .date-cell p {
-    text-align: center; /* 居中文本 */
+    text-align: center;
 }
 
-/* 如果需要垂直居中，可以考虑设置行高与容器高度相同 */
 .date-cell li {
-    list-style-type: none; /* 移除列表项的默认样式 */
+    list-style-type: none;
     padding: 0;
     margin: 0;
     display: flex;
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
+    justify-content: center;
+    align-items: center;
 }
 
 .center-text p {
     text-align: center;
-    margin-bottom: 10px; /* 调整这个值以增加或减少间距 */
+    margin-bottom: 10px;
 }
 
 .center-text p:last-child {
-    border-bottom: 1px solid #000; /* 分割线颜色和粗细 */
-    padding-bottom: 5px; /* 可选：给分割线下方留出一些空间 */
+    border-bottom: 1px solid #000;
+    padding-bottom: 5px;
 }
 
 .notes-month {
@@ -41,5 +40,5 @@
 }
 
 .notes-month section {
-    margin-bottom: 5px; /* 根据需要调整间距 */
+    margin-bottom: 5px;
 }
