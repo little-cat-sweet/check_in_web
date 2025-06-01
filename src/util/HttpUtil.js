@@ -5,9 +5,6 @@ const baseUrl = 'http://localhost:8080'; // 您的基础 URL
 // 创建 axios 实例
 const axiosInstance = axios.create({
     baseURL: baseUrl,
-    headers: {
-        'Content-Type': 'application/json'
-    }
 });
 
 // 添加请求拦截器，确保每次请求都带上最新的 token
@@ -17,6 +14,12 @@ axiosInstance.interceptors.request.use(
         if (token) {
             config.headers['Authorization'] = `${token}`;
         }
+
+        // 如果请求体是 FormData 类型，则不设置 Content-Type，让浏览器自动处理
+        if (!(config.data instanceof FormData)) {
+            config.headers['Content-Type'] = 'application/json';
+        }
+
         return config;
     },
     (error) => {

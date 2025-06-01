@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { UploadOutlined, UserOutlined } from '@ant-design/icons';
-import { Layout, Menu, theme } from 'antd';
+import { UploadOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
+import { Layout, Menu, Dropdown, Avatar, Space, theme } from 'antd';
 import Target from "../../component/Target";
 import Conclusion from "../../component/Conclusion";
 import TargetItemContainer from "../../component/TargetItemContainer";
@@ -25,14 +25,27 @@ const items = [
     }
 ];
 
+const menu = (
+    <Menu>
+        <Menu.Item key="editProfile">编辑个人资料</Menu.Item>
+        <Menu.Item key="logout">退出登录</Menu.Item>
+    </Menu>
+);
+
 const Main = () => {
+    const [selectedKey, setSelectedKey] = useState('1');
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
-    const [selectedKey, setSelectedKey] = useState('1');
-    const handleMenuClick = (e) => {
-        setSelectedKey(e.key);
+    const handleMenuClick = ({ key }) => {
+        if (key === "editProfile") {
+            console.log("Edit Profile");
+            // 这里可以添加跳转到编辑个人资料页面的逻辑
+        } else if (key === "logout") {
+            console.log("Logout");
+            // 这里可以添加登出逻辑
+        }
     };
 
     const renderContent = () => {
@@ -47,6 +60,7 @@ const Main = () => {
                 return null;
         }
     };
+
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider
@@ -60,7 +74,7 @@ const Main = () => {
                 }}
             >
                 <div className="demo-logo-vertical" />
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} onClick={handleMenuClick} />
+                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} onClick={({ key }) => setSelectedKey(key)} />
             </Sider>
             <Layout>
                 <Content
@@ -87,8 +101,18 @@ const Main = () => {
                 >
                     Welcome to use check_in app !
                 </Footer>
+                {/* 用户头像 */}
+                <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
+                    <Dropdown overlay={menu} trigger={['click']}>
+                        <Space direction="horizontal">
+                            <Avatar size="large" icon={<UserOutlined />} />
+                            <DownOutlined />
+                        </Space>
+                    </Dropdown>
+                </div>
             </Layout>
         </Layout>
     );
 };
+
 export default Main;
