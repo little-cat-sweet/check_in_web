@@ -1,9 +1,24 @@
-import React, { useState } from 'react';
-import { UploadOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
-import { Layout, Menu, Dropdown, Avatar, Space, theme } from 'antd';
+import React, { useState, useEffect } from 'react';
+import {
+    UploadOutlined,
+    UserOutlined,
+    DownOutlined
+} from '@ant-design/icons';
+import {
+    Layout,
+    Menu,
+    Dropdown,
+    Avatar,
+    Space,
+    theme,
+    Spin,
+    message
+} from 'antd';
+
 import Target from "../../component/Target";
 import Conclusion from "../../component/Conclusion";
 import TargetItemContainer from "../../component/TargetItemContainer";
+import httpUtil from "../../util/HttpUtil";
 
 const { Content, Footer, Sider } = Layout;
 
@@ -34,9 +49,35 @@ const menu = (
 
 const Main = () => {
     const [selectedKey, setSelectedKey] = useState('1');
+    const [avatarUrl, setAvatarUrl] = useState(null);
+    const [loading, setLoading] = useState(true); // 加载状态
+
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+    useEffect(() => {
+        const fetchAvatar = async () => {
+            try {
+                const response = await httpUtil.getRequest("/user/avatar");
+
+                if (response.success && response.data?.base64) {
+                    const { base64, mimeType } = response.data;
+                    const imageUrl = `data:${mimeType};base64,${base64}`;
+                    setAvatarUrl(imageUrl);
+                } else {
+                    setAvatarUrl(null);
+                }
+            } catch (error) {
+                console.error('Failed to load avatar:', error);
+                setAvatarUrl(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAvatar();
+    }, []);
 
     const handleMenuClick = ({ key }) => {
         if (key === "editProfile") {
@@ -74,13 +115,19 @@ const Main = () => {
                 }}
             >
                 <div className="demo-logo-vertical" />
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} onClick={({ key }) => setSelectedKey(key)} />
+                <Menu
+                    theme="dark"
+                    mode="inline"
+                    defaultSelectedKeys={['1']}
+                    items={items}
+                    onClick={({ key }) => setSelectedKey(key)}
+                />
             </Sider>
             <Layout>
                 <Content
                     style={{
                         margin: '24px 16px 0',
-                        minHeight: 'calc(100vh - 100px)'
+                        minHeight: 'calc(100vh - 100px)',
                     }}
                 >
                     <div
@@ -101,11 +148,21 @@ const Main = () => {
                 >
                     Welcome to use check_in app !
                 </Footer>
+
                 {/* 用户头像 */}
                 <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
                     <Dropdown overlay={menu} trigger={['click']}>
                         <Space direction="horizontal">
-                            <Avatar size="large" icon={<UserOutlined />} />
+                            {loading ? (
+                                <Spin size="small" />
+                            ) : (
+                                <Avatar
+                                    size="large"
+                                    src={avatarUrl}
+                                    icon={<UserOutlined />}
+                                    alt="User Avatar"
+                                />
+                            )}
                             <DownOutlined />
                         </Space>
                     </Dropdown>
