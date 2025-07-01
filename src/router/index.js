@@ -5,7 +5,7 @@ const Login = lazy(() => import("../page/Login"));
 const Update = lazy(() => import("../page/Update"))
 const Main = lazy(() => import("../page/Main"))
 const Register = lazy(() => import("../page/Register"))
-
+const EditProfile = lazy(() => import("../component/EditProfile"))
 const withLoadingComponent = (comp) => (
     <React.Suspense fallback={<div>loading...</div>}>
         {comp}
@@ -32,6 +32,10 @@ const routes = [
         {
             path: "/register",
             element: withLoadingComponent(<Register/>)
+        },
+        {
+            path: "/editProfile",
+            element: withLoadingComponent(<EditProfile/>)
         }
     ]
 ;
