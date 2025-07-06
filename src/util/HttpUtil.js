@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const baseUrl = 'http://localhost:8080'; // 您的基础 URL
+const baseUrl = process.env.REACT_APP_BASE_URL;
 
 // 创建 axios 实例
 const axiosInstance = axios.create({
@@ -13,6 +12,7 @@ axiosInstance.interceptors.request.use(
         const token = localStorage.getItem('authorization');
         if (token) {
             config.headers['Authorization'] = `${token}`;
+            console.log('完整请求路径:', config.baseURL + config.url);
         }
 
         // 如果请求体是 FormData 类型，则不设置 Content-Type，让浏览器自动处理
