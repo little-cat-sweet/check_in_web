@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import ProfileMenu from '../../component/ProfileMenu';
 import {
@@ -12,14 +12,12 @@ import {
     Avatar,
     Space,
     theme,
-    Spin,
     message
 } from 'antd';
 
 import Target from "../../component/Target";
 import Conclusion from "../../component/Conclusion";
 import TargetItemContainer from "../../component/TargetItemContainer";
-import httpUtil from "../../util/HttpUtil";
 
 const {Content, Footer, Sider} = Layout;
 
@@ -27,25 +25,22 @@ const items = [
     {
         key: '1',
         icon: <UserOutlined/>,
-        label: 'Targets',
+        label: '每日目标',
     },
     {
         key: '2',
         icon: <UploadOutlined/>,
-        label: 'Target Config',
+        label:'目标',
     },
     {
         key: '3',
         icon: <UploadOutlined/>,
-        label: 'Conclusion',
+        label: '总结',
     }
 ];
 
 const Main = () => {
     const [selectedKey, setSelectedKey] = useState('1');
-    const [avatarUrl, setAvatarUrl] = useState(null);
-    const [loading, setLoading] = useState(true); // 加载状态
-
     const navigate = useNavigate();
 
     const handleEditProfile = () => {
@@ -61,29 +56,6 @@ const Main = () => {
     const {
         token: {colorBgContainer, borderRadiusLG},
     } = theme.useToken();
-
-    useEffect(() => {
-        const fetchAvatar = async () => {
-            try {
-                const response = await httpUtil.getRequest("/user/avatar");
-
-                if (response.success && response.data?.base64) {
-                    const {base64, mimeType} = response.data;
-                    const imageUrl = `data:${mimeType};base64,${base64}`;
-                    setAvatarUrl(imageUrl);
-                } else {
-                    setAvatarUrl(null);
-                }
-            } catch (error) {
-                console.error('Failed to load avatar:', error);
-                setAvatarUrl(null);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchAvatar();
-    }, []);
 
     const renderContent = () => {
         switch (selectedKey) {
@@ -150,16 +122,11 @@ const Main = () => {
                     <Dropdown overlay={<ProfileMenu onEdit={handleEditProfile} onLogout={handleLogout}/>}
                               trigger={['click']}>
                         <Space direction="horizontal">
-                            {loading ? (
-                                <Spin size="small"/>
-                            ) : (
-                                <Avatar
-                                    size="large"
-                                    src={avatarUrl}
-                                    icon={<UserOutlined/>}
-                                    alt="User Avatar"
-                                />
-                            )}
+                            <Avatar
+                                size="large"
+                                icon={<UserOutlined/>}
+                                alt="Default User Avatar"
+                            />
                         </Space>
                     </Dropdown>
                 </div>

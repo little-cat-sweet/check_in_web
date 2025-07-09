@@ -3,7 +3,6 @@ import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import httpUtil from '../../util/HttpUtil';
 
-
 const Update = () => {
 
     const isValidEmail = (email) => {
@@ -20,9 +19,9 @@ const Update = () => {
     const backToLogin = () => {
         navigate("/login")
     }
+
     const onFinish = (formData) => {
         console.log('Received values:', formData);
-        // 在此处处理登录逻辑
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -30,7 +29,6 @@ const Update = () => {
     };
 
     const updateEmailValue = (e) => {
-
         setEmail(e.target.value)
     }
 
@@ -38,9 +36,7 @@ const Update = () => {
         setPassword(e.target.value)
     }
 
-
     const sendCode = async () => {
-
         if (!isValidEmail(email)) {
             message.error('请输入有效的邮箱地址');
             return;
@@ -48,9 +44,9 @@ const Update = () => {
 
         const data = await httpUtil.getRequest("/user/code?email=" + email)
         if (data.success) {
-            message.info("Please check your email !")
+            message.info("验证码已发送到您的邮箱，请查收！")
         } else {
-            message.info("Find admin to have a help")
+            message.error("获取验证码失败，请联系管理员")
         }
     }
 
@@ -66,13 +62,12 @@ const Update = () => {
 
         const data = await httpUtil.getRequest("/user/updatePassword?" + "email=" + email + "&code=" + code + "&newPassword=" + password);
         if (data.success) {
-            message.info(data.message)
+            message.info("密码修改成功，请使用新密码登录")
             navigate('/login')
         } else {
-            message.error(data.message)
+            message.error(data.message || "密码修改失败，请重试")
         }
     }
-
 
     return (
         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
@@ -83,46 +78,48 @@ const Update = () => {
                 onFinishFailed={onFinishFailed}
             >
                 <Form.Item
-                    label="Email"
+                    label="邮箱"
                     name="email"
                     onChange={updateEmailValue}
-                    rules={[{required: true, message: 'Please input your email!'},
-                        {type: 'email', message: 'Please enter a valid email address!'}]}
+                    rules={[{required: true, message: '请输入您的邮箱!'},
+                        {type: 'email', message: '请输入有效的邮箱地址!'}]}
                 >
                     <Input/>
                 </Form.Item>
 
                 <Form.Item
-                    label="Code"
+                    label="验证码"
                     name="code"
                     onChange={updateCodeValue}
-                    rules={[{required: true, message: 'Please input your code'}]}
+                    rules={[{required: true, message: '请输入验证码'}]}
                 >
                     <Input/>
                 </Form.Item>
+
                 <Form.Item>
                     <div style={{display: 'flex', justifyContent: 'space-between'}}>
                         <Button type="primary" onClick={sendCode}>
-                            Request code
+                            获取验证码
                         </Button>
-
                     </div>
                 </Form.Item>
+
                 <Form.Item
-                    label="NewPassword"
+                    label="新密码"
                     name="newPassword"
                     onChange={updatePasswordValue}
-                    rules={[{required: true, message: 'Please input your code'}]}
+                    rules={[{required: true, message: '请输入新密码'}]}
                 >
                     <Input.Password/>
                 </Form.Item>
+
                 <Form.Item>
                     <div style={{display: 'flex', justifyContent: 'space-between'}}>
                         <Button type="primary" onClick={requestUpdatePassword}>
-                            Update
+                            修改密码
                         </Button>
                         <Button type="primary" onClick={backToLogin}>
-                            back to login
+                            返回登录
                         </Button>
                     </div>
                 </Form.Item>

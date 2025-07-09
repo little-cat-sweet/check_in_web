@@ -1,4 +1,4 @@
-import { Button, Form, Input, message, Upload } from 'antd';
+import { Button, Form, Input, message} from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import httpUtil from '../../util/HttpUtil';
@@ -7,37 +7,21 @@ const Register = () => {
     const [form] = Form.useForm();
     const [isMessageInitialized, setMessageInitialized] = useState(false);
     const [email, setEmail] = useState("");
+    const [code, setCode] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [name, setName] = useState("");
-    const [headImage, setHeadImage] = useState(null); // 存储图片对象
 
     useEffect(() => {
         console.log("password", password);
         console.log("confirmPassword", confirmPassword);
     }, [password, confirmPassword]);
 
-    const beforeUpload = (file) => {
-        const isValidType = file.type === 'image/jpeg' || file.type === 'image/png';
-        if (!isValidType) {
-            message.error('只能上传 JPG/PNG 格式的图片!');
-            return Upload.LIST_IGNORE;
-        }
-        const isValidSize = file.size / 1024 / 1024 < 5; // 限制为 5MB
-        if (!isValidSize) {
-            message.error('图片大小不能超过 5MB!');
-            return Upload.LIST_IGNORE;
-        }
-
-        // 设置图片文件
-        setHeadImage(file);
-        return false; // 返回 false 阻止自动上传
-    };
-
     const register = async () => {
         const nameValue = name;
         const emailValue = email;
         const passwordValue = password;
+        const codeValue = code;
 
         if (confirmPassword !== passwordValue) {
             message.warning("密码不一致，请重新输入！");
@@ -51,10 +35,8 @@ const Register = () => {
         formData.append('name', nameValue);
         formData.append('email', emailValue);
         formData.append('password', passwordValue);
+        formData.append('code', codeValue);
 
-        if (headImage) {
-            formData.append('headImage', headImage); // 添加头像文件
-        }
 
         console.log("ssss" + formData.toString())
 
@@ -83,6 +65,10 @@ const Register = () => {
         setEmail(e.target.value);
     };
 
+    const updateCode = (e) => {
+        setCode(e.target.value)
+    }
+
     const updateNameValue = (e) => {
         setName(e.target.value);
     };
@@ -94,6 +80,27 @@ const Register = () => {
     const updateConfirmPasswordValue = (e) => {
         setConfirmPassword(e.target.value);
     };
+
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const sendCode = async () => {
+
+        if (!isValidEmail(email)) {
+            message.error('请输入有效的邮箱地址');
+            return;
+        }
+
+        const data = await httpUtil.getRequest("/user/code?email=" + email)
+        if (data.success) {
+            message.info("请查收您的邮箱！")
+        } else {
+            message.info(data.message)
+        }
+    }
+
 
     const navigate = useNavigate();
 
@@ -111,7 +118,7 @@ const Register = () => {
                 style={{ width: 400 }}
             >
                 <Form.Item
-                    label="Name"
+                    label="姓名"
                     name="name"
                     rules={[{ required: true, message: '请输入姓名' }]}
                     onChange={updateNameValue}
@@ -120,7 +127,7 @@ const Register = () => {
                 </Form.Item>
 
                 <Form.Item
-                    label="Email"
+                    label="邮箱"
                     name="email"
                     rules={[
                         { required: true, message: '请输入邮箱地址' },
@@ -129,6 +136,25 @@ const Register = () => {
                     onChange={updateEmailValue}
                 >
                     <Input />
+                </Form.Item>
+
+                <Form.Item
+                    label="验证码"
+                    name="code"
+                    rules={[
+                        { required: true, message: '请输入验证码' },
+                    ]}
+                    onChange={updateCode}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item>
+                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                        <Button type="primary" onClick={sendCode}>
+                            获取验证码
+                        </Button>
+                    </div>
                 </Form.Item>
 
                 <Form.Item
@@ -147,18 +173,6 @@ const Register = () => {
                     onChange={updateConfirmPasswordValue}
                 >
                     <Input.Password />
-                </Form.Item>
-
-                {/* 头像上传 */}
-                <Form.Item label="头像" name="headImage">
-                    <Upload
-                        listType="picture-card"
-                        showUploadList={true}
-                        beforeUpload={beforeUpload}
-                        multiple={false}
-                    >
-                        选择头像
-                    </Upload>
                 </Form.Item>
 
                 <Form.Item>

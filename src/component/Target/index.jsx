@@ -46,15 +46,16 @@ const Target = () => {
     const [total, setTotal] = useState(0);
 
     const dayOptions = [
-        {label: 'Monday', value: 1},
-        {label: 'Tuesday', value: 2},
-        {label: 'Wednesday', value: 3},
-        {label: 'Thursday', value: 4},
-        {label: 'Friday', value: 5},
-        {label: 'Saturday', value: 6},
-        {label: 'Sunday', value: 7},
-        {label: 'Everyday', value: 0}
+        {label: '星期一', value: 1},
+        {label: '星期二', value: 2},
+        {label: '星期三', value: 3},
+        {label: '星期四', value: 4},
+        {label: '星期五', value: 5},
+        {label: '星期六', value: 6},
+        {label: '星期天', value: 7},
+        {label: '每日', value: 0}
     ];
+
     useEffect(() => {
         flushData()
     }, [currentPage, pageSize])
@@ -66,6 +67,7 @@ const Target = () => {
     const handleName = (e) => {
         setName(e.target.value);
     };
+
     const handleDescription = (e) => {
         setDescription(e.target.value)
     }
@@ -87,25 +89,27 @@ const Target = () => {
             setTargets(res.data);
             setTotal(res.pagination.total)
         } else {
-            message.error("find target failed")
+            message.error("查询目标失败")
         }
     }
 
     const addTarget = async () => {
         const target = {};
         if (null === name || '' === name) {
-            message.warning("pls input name");
+            message.warning("请输入名称");
+            return; // 添加返回，防止继续执行
         }
         target.name = name;
         target.description = description;
         target.day = day;
+
         const res = await httpUtil.postRequest("/target/add", target);
         if (res.success) {
-            message.info(res.message)
+            message.info("添加成功")
             await flushData()
             handleCancel();
         } else {
-            message.error(res.message);
+            message.error(res.message || "添加失败");
             handleCancel();
         }
     }
@@ -113,31 +117,31 @@ const Target = () => {
     // 定义表格列
     const columns = [
         {
-            title: 'Name',
+            title: '标题',
             dataIndex: 'name',
             key: 'name',
         },
         {
-            title: 'Description',
+            title: '内容',
             dataIndex: 'description',
             key: 'description',
         },
         {
-            title: 'Day',
+            title: '提醒频率',
             dataIndex: 'day',
             key: 'day',
             render: (dayValue) => {
                 const option = dayOptions.find((option) => option.value === dayValue);
-                return option ? option.label : 'Unknown';
+                return option ? option.label : '未知';
             },
         },
         {
-            title: 'Action',
+            title: '操作',
             key: 'action',
             render: (_, record) => (
                 <div>
                     <Button type="primary" danger onClick={() => handleDelete(record)}>
-                        Delete
+                        删除
                     </Button>
                 </div>
             ),
@@ -145,13 +149,12 @@ const Target = () => {
     ];
 
     const handleDelete = async (e) => {
-
         const res = await httpUtil.postRequest("/target/delete?id=" + e.id);
         if (res.success) {
             await flushData();
-            message.info("delete successfully")
+            message.info("删除成功")
         } else {
-            message.error(res.message)
+            message.error(res.message || "删除失败")
         }
     };
 
@@ -173,30 +176,30 @@ const Target = () => {
                         <Row>
                             <Col span={8}>
                                 <Button type="primary" onClick={showModal}>
-                                    添加target
+                                    添加目标
                                 </Button>
                                 <Modal
-                                    title="Adding target"
+                                    title="添加目标"
                                     visible={visible}
                                     onCancel={handleCancel}
                                     footer={[
-                                        <Button key="cancel" onClick={handleCancel}>cancel</Button>,
-                                        <Button key="confirm" type="primary" onClick={addTarget}>confirm</Button>
+                                        <Button key="cancel" onClick={handleCancel}>取消</Button>,
+                                        <Button key="confirm" type="primary" onClick={addTarget}>确认</Button>
                                     ]}
                                 >
                                     <Input
-                                        placeholder="pls input target name"
+                                        placeholder="请输入目标标题"
                                         value={name}
                                         onChange={handleName}
                                     />
                                     <Input
-                                        placeholder="pls input target description"
+                                        placeholder="请输入目标内容"
                                         value={description}
                                         onChange={handleDescription}
                                     />
 
                                     <Select
-                                        placeholder="Select a type"
+                                        placeholder="选择提醒频率"
                                         value={day}
                                         onChange={handleDay}
                                         style={{width: '100%'}}

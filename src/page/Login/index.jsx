@@ -21,12 +21,14 @@ const Login = () => {
         console.log("value -> ", e.target.value)
         updateEmail(e.target.value)
     }
+
     const updatePasswordValue = (e) => {
         console.log("password -> ", e.target.value)
         updatePassword(e.target.value)
     }
 
     const navigate = useNavigate();
+
     const onFinish = (formData) => {
         console.log('Received values:', formData);
         // 在此处处理登录逻辑
@@ -34,8 +36,7 @@ const Login = () => {
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
-        message.error('This is a normal message');
-
+        message.error('表单验证失败');
     };
 
     const login = async () => {
@@ -44,19 +45,19 @@ const Login = () => {
             data = await httpUtil.postRequest('/user/login?email=' + email + '&password=' + password, null);
             if (data.success === true) {
                 localStorage.setItem("authorization", data.data)
-                message.info("login success !")
+                message.info("登录成功！")
                 navigate('/main')
             } else {
-                message.warning(data.message)
+                message.warning(data.message || "登录失败，请检查邮箱和密码")
                 navigate('/login')
             }
         } catch (e) {
-            message.error("Pls find admin !")
+            message.error("网络错误，请联系管理员！")
         }
     }
 
     const handleUpdatePassword = () => {
-        // 点击 "Update Password" 按钮时执行的函数，用于跳转到修改密码页面
+        // 点击 "修改密码" 按钮时执行的函数，用于跳转到修改密码页面
         navigate('/update');
     };
 
@@ -73,38 +74,39 @@ const Login = () => {
                 onFinishFailed={onFinishFailed}
             >
                 <Form.Item
-                    label="Email"
+                    label="邮箱"
                     name="email"
                     onChange={updateEmailValue}
-                    rules={[{required: true, message: 'Please input your email!'},
-                        {type: 'email', message: 'Please enter a valid email address!'}]}
+                    rules={[{required: true, message: '请输入您的邮箱！'},
+                        {type: 'email', message: '请输入有效的邮箱地址！'}]}
                 >
                     <Input/>
                 </Form.Item>
 
                 <Form.Item
-                    label="Password"
+                    label="密码"
                     name="password"
                     onChange={updatePasswordValue}
-                    rules={[{required: true, message: 'Please input your password!'}]}
+                    rules={[{required: true, message: '请输入您的密码！'}]}
                 >
                     <Input.Password/>
                 </Form.Item>
+
                 <Form.Item>
                     <div style={{display: 'flex', justifyContent: 'space-between'}}>
                         <Button type="primary" htmlType="submit" onClick={login}>
-                            Log in
+                            登录
                         </Button>
                         <Button type="primary" onClick={goToRegister}>
-                            Register
+                            注册
                         </Button>
                     </div>
                 </Form.Item>
 
                 <Form.Item>
-                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                    <div style={{display: 'flex', justifyContent: 'left'}}>
                         <Button type="primary" onClick={handleUpdatePassword}>
-                            Update Password
+                            修改密码
                         </Button>
                     </div>
                 </Form.Item>
