@@ -1,0 +1,15 @@
+.header-style {
+    text-align: center;
+    color: #fff;
+    background-color: #4096ff;
+}
+.content-style {
+    text-align: center;
+    color: #000000;
+    background-color: #ffffff;
+}
+.footer-style {
+    text-align: center;
+    color: #ffffff;
+    background-color: black;
+}
