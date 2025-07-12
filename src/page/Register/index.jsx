@@ -1,4 +1,4 @@
-import { Button, Form, Input, message} from 'antd';
+import { Button, Form, Input, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import httpUtil from '../../util/HttpUtil';
@@ -110,6 +110,7 @@ const Register = () => {
             minHeight: '100vh',
             overflow: 'hidden',
         }}>
+            {/* 左侧图片区域 */}
             <div style={{
                 background: 'url(/static/images/registerLogo.jpg) no-repeat center center',
                 backgroundSize: 'cover',
@@ -150,6 +151,7 @@ const Register = () => {
                 </div>
             </div>
 
+            {/* 右侧表单区域 */}
             <div style={{
                 display: 'flex',
                 justifyContent: 'center',
@@ -157,6 +159,7 @@ const Register = () => {
                 padding: '30px 50px',
                 minHeight: '100vh',
                 overflowY: 'auto',
+                backgroundColor: '#f5f5f5', // 浅灰色背景
             }}>
                 <div style={{
                     width: '100%',
@@ -164,9 +167,13 @@ const Register = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     height: '100%',
+                    backgroundColor: '#fff', // 白色表单卡片
+                    padding: '30px',
+                    borderRadius: '8px',
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
                 }}>
                     <div style={{ marginBottom: '20px' }}>
-                        <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: 'bold' }}>创建新账号</h2>
+                        <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: 'bold', color: '#333' }}>创建新账号</h2>
                         <p style={{ color: '#666' }}>
                             已有账号？<a href="#" onClick={backToLogin} style={{ color: '#1677ff' }}>立即登录</a>
                         </p>
@@ -185,7 +192,16 @@ const Register = () => {
                             rules={[{ required: true, message: '请输入用户名' }]}
                             onChange={updateNameValue}
                         >
-                            <Input placeholder="请输入用户名" />
+                            <Input
+                                placeholder="请输入用户名"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
                         </Form.Item>
 
                         <Form.Item
@@ -197,7 +213,16 @@ const Register = () => {
                             ]}
                             onChange={updateEmailValue}
                         >
-                            <Input placeholder="请输入邮箱地址" />
+                            <Input
+                                placeholder="请输入邮箱地址"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
                         </Form.Item>
 
                         <Form.Item
@@ -208,12 +233,30 @@ const Register = () => {
                             ]}
                             onChange={updateCode}
                         >
-                            <Input placeholder="请输入验证码" />
+                            <Input
+                                placeholder="请输入验证码"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
                         </Form.Item>
 
                         <Form.Item>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <Button type="primary" onClick={sendCode} style={{ backgroundColor: '#1677ff', borderColor: '#1677ff' }}>
+                                <Button
+                                    type="primary"
+                                    onClick={sendCode}
+                                    style={{
+                                        backgroundColor: '#1677ff',
+                                        borderColor: '#1677ff',
+                                        height: '40px',
+                                        borderRadius: '4px',
+                                    }}
+                                >
                                     获取验证码
                                 </Button>
                             </div>
@@ -228,7 +271,16 @@ const Register = () => {
                             ]}
                             onChange={updatePasswordValue}
                         >
-                            <Input.Password placeholder="请输入密码" />
+                            <Input.Password
+                                placeholder="请输入密码"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
                         </Form.Item>
 
                         <Form.Item
@@ -246,7 +298,16 @@ const Register = () => {
                             ]}
                             onChange={updateConfirmPasswordValue}
                         >
-                            <Input.Password placeholder="请再次输入密码" />
+                            <Input.Password
+                                placeholder="请再次输入密码"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
                         </Form.Item>
 
                         <Form.Item style={{ marginTop: 'auto' }}>
@@ -260,7 +321,8 @@ const Register = () => {
                                     backgroundColor: '#1677ff',
                                     borderColor: '#1677ff',
                                     fontSize: '16px',
-                                    fontWeight: 'bold'
+                                    fontWeight: 'bold',
+                                    borderRadius: '4px',
                                 }}
                             >
                                 立即注册
