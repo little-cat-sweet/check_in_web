@@ -175,7 +175,7 @@ const Register = () => {
                     <div style={{ marginBottom: '20px' }}>
                         <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: 'bold', color: '#333' }}>创建新账号</h2>
                         <p style={{ color: '#666' }}>
-                            已有账号？<a href="#" onClick={backToLogin} style={{ color: '#1677ff' }}>立即登录</a>
+                            已有账号？<a href="#" onClick={backToLogin} style={{ color: '#000' }}>立即登录</a>
                         </p>
                     </div>
 
@@ -251,8 +251,8 @@ const Register = () => {
                                     type="primary"
                                     onClick={sendCode}
                                     style={{
-                                        backgroundColor: '#1677ff',
-                                        borderColor: '#1677ff',
+                                        backgroundColor: '#000', // 黑色按钮
+                                        borderColor: '#000',
                                         height: '40px',
                                         borderRadius: '4px',
                                     }}
@@ -318,8 +318,8 @@ const Register = () => {
                                 style={{
                                     width: '100%',
                                     height: '40px',
-                                    backgroundColor: '#1677ff',
-                                    borderColor: '#1677ff',
+                                    backgroundColor: '#000',
+                                    borderColor: '#000',
                                     fontSize: '16px',
                                     fontWeight: 'bold',
                                     borderRadius: '4px',

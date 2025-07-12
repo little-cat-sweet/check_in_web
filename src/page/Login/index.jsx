@@ -141,18 +141,20 @@ const Login = () => {
                                 htmlType="submit"
                                 onClick={login}
                                 style={{
-                                    backgroundColor: '#1890ff',
-                                    borderColor: '#1890ff',
-                                    height: '40px',
-                                    borderRadius: '4px',
                                     width: '100%',
+                                    height: '40px',
+                                    backgroundColor: '#000', // 黑色按钮
+                                    borderColor: '#000',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    borderRadius: '4px',
                                 }}
                             >
                                 登录
                             </Button>
                             <a
                                 href="javascript:void(0);"
-                                style={{ float: 'right', marginTop: '10px', color: '#1890ff' }}
+                                style={{ float: 'right', marginTop: '10px', color: '#000' }} // 黑色链接
                                 onClick={() => navigate('/update')}
                             >
                                 忘记密码?
@@ -160,7 +162,7 @@ const Login = () => {
                         </Form.Item>
                     </Form>
                     <p style={{ marginTop: '20px' }}>
-                        还没有账号? <a href="#" onClick={goToRegister} style={{ color: '#1890ff' }}>立即注册</a>
+                        还没有账号? <a href="#" onClick={goToRegister} style={{ color: '#000' }}>立即注册</a>
                     </p>
                 </div>
             </div>
