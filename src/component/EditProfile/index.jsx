@@ -5,11 +5,12 @@ import {
     Button,
     message,
     Card,
-    Spin
+    Spin,
+    Row,
+    Col
 } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-
+import './index.css';
 import httpUtil from '../../util/HttpUtil';
 
 const EditProfile = () => {
@@ -55,8 +56,8 @@ const EditProfile = () => {
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 50 }}>
-                <Spin tip="加载中..." />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <Spin tip="加载中..." size="large" />
             </div>
         );
     }
@@ -68,19 +69,22 @@ const EditProfile = () => {
             padding: '24px',
             backgroundColor: '#f8f8f8',
             borderRadius: 8,
-            marginTop: '20px'
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            marginTop: '50px'
         }}>
             {/* 返回按钮居中 */}
-            <div style={{ display: 'flex', justifyContent: 'left', marginBottom: 16 }}>
-                <Button type="default" onClick={() => navigate(-1)}>
-                    ← 返回
-                </Button>
-            </div>
+            <Row justify="start" align="middle" style={{ marginBottom: 16 }}>
+                <Col>
+                    <Button type="default" onClick={() => navigate(-1)}>
+                        ← 返回
+                    </Button>
+                </Col>
+            </Row>
 
             <Card
                 title="编辑个人资料"
                 bordered={false}
-                style={{ textAlign: 'center' }}
+                style={{ textAlign: 'center', padding: '24px', borderRadius: 8, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}
             >
                 {/* 表单容器设置最大宽度并居中 */}
                 <div style={{ maxWidth: 300, margin: '0 auto' }}>
@@ -94,9 +98,10 @@ const EditProfile = () => {
                             label="用户名"
                             name="name"
                             rules={[{ required: true }]}
-                            labelCol={{ style: { textAlign: 'left' } }}
+                            labelCol={{ span: 24, style: { textAlign: 'left' } }}
+                            wrapperCol={{ span: 24 }}
                         >
-                            <Input placeholder="请输入用户名" />
+                            <Input placeholder="请输入用户名" style={{ borderRadius: 8 }} />
                         </Form.Item>
 
                         <Form.Item
@@ -106,13 +111,20 @@ const EditProfile = () => {
                                 { required: true },
                                 { type: 'email', message: '请输入有效的邮箱地址' }
                             ]}
-                            labelCol={{ style: { textAlign: 'left' } }}
+                            labelCol={{ span: 24, style: { textAlign: 'left' } }}
+                            wrapperCol={{ span: 24 }}
                         >
-                            <Input placeholder="请输入邮箱" disabled />
+                            <Input placeholder="请输入邮箱" disabled style={{ borderRadius: 8 }} />
                         </Form.Item>
 
                         <Form.Item>
-                            <Button type="primary" htmlType="submit" block>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                block
+                                className="black-button"
+                                style={{ borderRadius: 8 }}
+                            >
                                 保存修改
                             </Button>
                         </Form.Item>

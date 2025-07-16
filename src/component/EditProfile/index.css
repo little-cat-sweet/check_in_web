@@ -1,0 +1,11 @@
+.black-button {
+    background-color: #000000 !important; /* 黑色背景 */
+    border-color: #000000 !important;     /* 边框颜色也设为黑色 */
+    color: #ffffff !important;           /* 白色文字，提高对比度 */
+}
+
+/* 可选：添加悬停效果 */
+.black-button:hover {
+    background-color: #333333 !important;
+    border-color: #333333 !important;
+}

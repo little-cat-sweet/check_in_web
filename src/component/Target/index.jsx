@@ -5,25 +5,21 @@ import {Content, Header} from "antd/es/layout/layout";
 
 const headerStyle = {
     textAlign: 'center',
-    color: '#fff',
+    color: '#000', // 黑色文字
     height: 64,
     paddingInline: 48,
     lineHeight: '64px',
-    backgroundColor: '#fff',
+    backgroundColor: '#fff', // 白色背景
+    borderBottom: '1px solid #000', // 黑色边框
 };
 
 const contentStyle = {
     textAlign: 'center',
     minHeight: 120,
     lineHeight: '120px',
-    color: '#fff',
-    backgroundColor: '#fff',
-};
-
-const footerStyle = {
-    textAlign: 'center',
-    color: '#fff',
-    backgroundColor: '#4096ff',
+    color: '#000', // 黑色文字
+    backgroundColor: '#fff', // 白色背景
+    padding: '20px',
 };
 
 const layoutStyle = {
@@ -31,8 +27,8 @@ const layoutStyle = {
     overflow: 'hidden',
     width: 'calc(100% - 8px)',
     maxWidth: 'calc(100% - 8px)',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', // 黑色阴影
 };
-
 
 const Target = () => {
 
@@ -97,7 +93,7 @@ const Target = () => {
         const target = {};
         if (null === name || '' === name) {
             message.warning("请输入名称");
-            return; // 添加返回，防止继续执行
+            return;
         }
         target.name = name;
         target.description = description;
@@ -114,22 +110,24 @@ const Target = () => {
         }
     }
 
-    // 定义表格列
     const columns = [
         {
             title: '标题',
             dataIndex: 'name',
             key: 'name',
+            width: '25%',
         },
         {
             title: '内容',
             dataIndex: 'description',
             key: 'description',
+            width: '25%',
         },
         {
             title: '提醒频率',
             dataIndex: 'day',
             key: 'day',
+            width: '25%',
             render: (dayValue) => {
                 const option = dayOptions.find((option) => option.value === dayValue);
                 return option ? option.label : '未知';
@@ -138,6 +136,7 @@ const Target = () => {
         {
             title: '操作',
             key: 'action',
+            width: '25%',
             render: (_, record) => (
                 <div>
                     <Button type="primary" danger onClick={() => handleDelete(record)}>
@@ -175,7 +174,7 @@ const Target = () => {
                     <Header style={headerStyle}>
                         <Row>
                             <Col span={8}>
-                                <Button type="primary" onClick={showModal}>
+                                <Button type="primary" onClick={showModal} style={{ backgroundColor: '#000', color: '#fff', borderColor: '#000' }}>
                                     添加目标
                                 </Button>
                                 <Modal
@@ -183,37 +182,108 @@ const Target = () => {
                                     visible={visible}
                                     onCancel={handleCancel}
                                     footer={[
-                                        <Button key="cancel" onClick={handleCancel}>取消</Button>,
-                                        <Button key="confirm" type="primary" onClick={addTarget}>确认</Button>
+                                        <Button
+                                            key="cancel"
+                                            onClick={handleCancel}
+                                            style={{
+                                                backgroundColor: '#000',
+                                                color: '#fff',
+                                                borderColor: '#000',
+                                                marginRight: 8
+                                            }}
+                                        >
+                                            取消
+                                        </Button>,
+                                        <Button
+                                            key="confirm"
+                                            type="primary"
+                                            onClick={addTarget}
+                                            style={{
+                                                backgroundColor: '#000',
+                                                color: '#fff',
+                                                borderColor: '#000'
+                                            }}
+                                        >
+                                            确认
+                                        </Button>
                                     ]}
+                                    style={{ borderRadius: 8 }}
+                                    bodyStyle={{ padding: 24 }}
                                 >
-                                    <Input
-                                        placeholder="请输入目标标题"
-                                        value={name}
-                                        onChange={handleName}
-                                    />
-                                    <Input
-                                        placeholder="请输入目标内容"
-                                        value={description}
-                                        onChange={handleDescription}
-                                    />
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                        <div>
+                                            <div style={{
+                                                marginBottom: 8,
+                                                fontSize: 14,
+                                                fontWeight: 500,
+                                                color: '#333'
+                                            }}>
+                                                目标标题
+                                            </div>
+                                            <Input
+                                                placeholder="请输入目标标题"
+                                                value={name}
+                                                onChange={handleName}
+                                                style={{
+                                                    height: 40,
+                                                    borderRadius: 4,
+                                                    borderColor: '#ddd'
+                                                }}
+                                            />
+                                        </div>
 
-                                    <Select
-                                        placeholder="选择提醒频率"
-                                        value={day}
-                                        onChange={handleDay}
-                                        style={{width: '100%'}}
-                                    >
-                                        {dayOptions.map((option) => (
-                                            <Select.Option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </Select.Option>
-                                        ))}
-                                    </Select>
+                                        <div>
+                                            <div style={{
+                                                marginBottom: 8,
+                                                fontSize: 14,
+                                                fontWeight: 500,
+                                                color: '#333'
+                                            }}>
+                                                目标内容
+                                            </div>
+                                            <Input
+                                                placeholder="请输入目标内容"
+                                                value={description}
+                                                onChange={handleDescription}
+                                                style={{
+                                                    height: 40,
+                                                    borderRadius: 4,
+                                                    borderColor: '#ddd'
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <div style={{
+                                                marginBottom: 8,
+                                                fontSize: 14,
+                                                fontWeight: 500,
+                                                color: '#333'
+                                            }}>
+                                                提醒频率
+                                            </div>
+                                            <Select
+                                                placeholder="选择提醒频率"
+                                                value={day}
+                                                onChange={handleDay}
+                                                style={{
+                                                    width: '100%',
+                                                    height: 40,
+                                                    borderRadius: 4,
+                                                    borderColor: '#ddd'
+                                                }}
+                                            >
+                                                {dayOptions.map((option) => (
+                                                    <Select.Option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </Select.Option>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                    </div>
                                 </Modal>
                             </Col>
-                            <Col span={8}>col-8</Col>
-                            <Col span={8}>col-8</Col>
+                            <Col span={16}></Col>
                         </Row>
                     </Header>
                     <Content style={{...contentStyle, lineHeight: 'normal', padding: 20}}>

@@ -75,14 +75,22 @@ const Main = () => {
 
     return (
         <>
-            {/* 内联样式覆盖 Ant Design 默认样式 */}
             <style jsx global>{`
-                .ant-menu-horizontal > .ant-menu-item-selected {
-                    color: #000 !important;
-                }
-                .ant-menu-horizontal > .ant-menu-item-selected::after {
-                    border-bottom-color: #000 !important;
-                }
+              .ant-menu-horizontal > .ant-menu-item-selected .ant-menu-overflow-item{
+                color: #000 !important;
+              }
+              .ant-menu-horizontal > .ant-menu-item-selected::after {
+                border-bottom-color: #000 !important;
+              }
+              .ant-menu-horizontal > .ant-menu-item:hover::after {
+                border-bottom-color: #000 !important;
+              }
+              .ant-menu-horizontal > .ant-menu-item:hover {
+                color: #000 !important;
+              }
+              .ant-menu-horizontal > .ant-menu-item-selected .anticon {
+                color: #000 !important;
+              }
             `}</style>
 
             <Layout style={{ minHeight: '100vh' }}>
@@ -128,11 +136,7 @@ const Main = () => {
                                 }}
                                 selectedKeys={[selectedKey]}
                                 onSelect={({ key }) => setSelectedKey(key)}
-                                itemStyle={{
-                                    borderBottom: '2px solid #000', // 选中项下方为黑色
-                                }}
                                 defaultActiveFirst={false}
-                                // 自定义选中项样式
                                 itemIcon={({ icon, theme }) => (
                                     <span style={{ fontSize: theme === 'filled' ? '18px' : '16px' }}>
                                         {icon}
@@ -154,8 +158,12 @@ const Main = () => {
                                 <Space direction="horizontal">
                                     <Avatar
                                         size="large"
-                                        icon={<UserOutlined />}
+                                        icon={<UserOutlined style={{ color: '#fff' }} />}
                                         alt="Default User Avatar"
+                                        style={{
+                                            backgroundColor: '#000000',
+                                            color: '#ffffff'
+                                        }}
                                     />
                                 </Space>
                             </Dropdown>

@@ -9,16 +9,19 @@ const columns = (handleConfirmComplete, cancel) => [
         dataIndex: 'name',
         key: 'name',
         render: (text) => text,
+        width: '25%',
     },
     {
         title: '内容',
         dataIndex: 'description',
         key: 'description',
+        width: '25%',
     },
     {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
+        width: '25%',
         render: (status) => {
             return status === 1 ? '已完成' : '未完成';
         },
@@ -26,6 +29,7 @@ const columns = (handleConfirmComplete, cancel) => [
     {
         title: '操作',
         key: 'action',
+        width: '25%',
         render: (_, record) => (
             <Space size="middle">
                 {record.status === 0 && (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, message, Modal } from 'antd';
+import { Calendar, message, Modal, Table } from 'antd';
 import httpUtil from "../../util/HttpUtil";
 import moment from 'moment';
 import './index.css';
@@ -82,6 +82,28 @@ const Conclusion = () => {
         return current.isBefore(startOfYear) || current.isAfter(today);
     };
 
+    const columns = [
+        {
+            title: '名称',
+            dataIndex: 'name',
+            key: 'name',
+            align: 'center',
+        },
+        {
+            title: '描述',
+            dataIndex: 'description',
+            key: 'description',
+            align: 'center',
+        },
+        {
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            align: 'center',
+            render: status => status === 1 ? <span style={{ color: '#52c41a' }}>完成</span> : <span style={{ color: '#ff4d4f' }}>未完成</span>,
+        },
+    ];
+
     return (
         <>
             <Calendar cellRender={cellRender} disabledDate={disabledDate}/>
@@ -92,15 +114,15 @@ const Conclusion = () => {
                 footer={null}
                 style={{maxHeight: '80vh'}}
             >
-                <div style={{maxHeight: '60vh', overflowY: 'auto'}}>
-                    {selectedDateItems.map(item => (
-                        <div key={item.id} className="center-text">
-                            <p>名称: {item.name}</p>
-                            <p>描述: {item.description}</p>
-                            <p>状态: {item.status === 1 ? '完成' : '未完成'}</p>
-                        </div>
-                    ))}
-                </div>
+                <Table
+                    columns={columns}
+                    dataSource={selectedDateItems.map(item => ({ ...item, key: item.id }))}
+                    pagination={false}
+                    bordered
+                    size="small"
+                    style={{ maxHeight: '60vh', overflowY: 'auto' }}
+                    rowClassName={() => 'table-row-center'}
+                />
             </Modal>
         </>
     );
