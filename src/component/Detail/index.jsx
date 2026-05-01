@@ -18,4 +18,4 @@ const Detail = ({ data }) => {
     );
 };
 
-export default Detail;    
+export default Detail;
