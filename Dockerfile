@@ -13,7 +13,7 @@ FROM nginx:alpine
 COPY --from=build /app/build /usr/share/nginx/html
 
 # 2. 复制你写好的 nginx.conf 到容器里（最稳妥的方式）
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf.prod /etc/nginx/nginx.conf
 
 # 3. 创建证书目录（避免启动报错）
 RUN mkdir -p /usr/local/nginx/https
