@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.TENCENT_REGISTRY_USER }}
           password: ${{ secrets.TENCENT_REGISTRY_PASSWORD }}
 
-      # 2. 构建并推送
+      # 2. 构建并推送镜像
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -26,7 +26,7 @@ jobs:
           push: true
           tags: ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
 
-      # 3. 自动部署到服务器
+      # 3. 自动登录服务器 → 部署
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
@@ -46,6 +46,8 @@ jobs:
               --network check-in \
               --restart always \
               -p 80:80 \
+              -p 443:443 \
+              -v /usr/share/nginx/https:/usr/share/nginx/https \
               ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
 
-            echo "✅ 前端部署成功！"
+            echo "✅ 前端部署成功！HTTPS 已生效！"
