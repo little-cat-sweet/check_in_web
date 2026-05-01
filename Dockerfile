@@ -10,8 +10,8 @@ RUN npm run build
 FROM nginx:alpine
 # 复制构建产物到 Nginx
 COPY --from=build /app/build /usr/share/nginx/html
-# 复制自定义的 Nginx 配置（这里路径写对了）
-COPY ./nginx.conf /etc/nginx/nginx.conf
+# 强制复制当前目录下的 nginx.conf，忽略大小写问题
+COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 80
 EXPOSE 443
 CMD ["nginx", "-g", "daemon off;"]
