@@ -10,16 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🔍 Debug：查看仓库结构（关键）
-#      - name: Debug repo structure
-#        run: |
-#          echo "当前路径:"
-#          pwd
-#          echo "==== 根目录 ===="
-#          ls -la
-#          echo "==== check_in_web 目录 ===="
-#          ls -la ./check_in_web || echo "❌ 没有这个目录"
-
       # 1. 登录腾讯云 CCR
       - name: Login to Tencent CCR
         uses: docker/login-action@v3
@@ -27,14 +17,6 @@ jobs:
           registry: ccr.ccs.tencentyun.com
           username: ${{ secrets.TENCENT_REGISTRY_USER }}
           password: ${{ secrets.TENCENT_REGISTRY_PASSWORD }}
-
-      # 🔍 Debug：确认 Dockerfile 和 nginx.conf 是否存在
-      - name: Debug files
-        run: |
-          echo "==== 查找 Dockerfile ===="
-          find . -name Dockerfile
-          echo "==== 查找 nginx.conf ===="
-          find . -name nginx.conf
 
       # 2. 构建并推送镜像
       - name: Build and push
@@ -65,7 +47,7 @@ jobs:
               --restart always \
               -p 80:80 \
               -p 443:443 \
-              -v /usr/share/nginx/https:/usr/share/nginx/https \
+              -v /usr/local/nginx/https:/usr/local/nginx/https \
               ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
 
             echo "✅ 前端部署成功！HTTPS 已生效！"
