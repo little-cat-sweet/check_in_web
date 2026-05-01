@@ -1,0 +1,51 @@
+name: 前端 CI/CD - 自动构建部署
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. 登录腾讯云 CCR
+      - name: Login to Tencent CCR
+        uses: docker/login-action@v3
+        with:
+          registry: ccr.ccs.tencentyun.com
+          username: ${{ secrets.TENCENT_REGISTRY_USER }}
+          password: ${{ secrets.TENCENT_REGISTRY_PASSWORD }}
+
+      # 2. 构建并推送
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
+
+      # 3. 自动部署到服务器
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker stop check-frontend || true
+            docker rm check-frontend || true
+            
+            docker login ccr.ccs.tencentyun.com -u ${{ secrets.TENCENT_REGISTRY_USER }} -p ${{ secrets.TENCENT_REGISTRY_PASSWORD }}
+            
+            docker pull ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
+            
+            docker run -d \
+              --name check-frontend \
+              --network check-in \
+              --restart always \
+              -p 80:80 \
+              ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
+
+            echo "✅ 前端部署成功！"
