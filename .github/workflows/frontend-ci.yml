@@ -22,7 +22,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./check_in_web
+          context: .
           push: true
           tags: ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
 
