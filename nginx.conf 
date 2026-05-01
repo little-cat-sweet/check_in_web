@@ -11,63 +11,25 @@ events {
 http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
-
-    sendfile        on;
     keepalive_timeout  65;
 
-    # HTTP 服务
     server {
         listen       80;
-        server_name  124.223.187.91 www.checkapp.asia;
+        server_name  localhost;
 
-        # 强制跳转 HTTPS（可选，如果你想全站 HTTPS 就打开）
-        # rewrite ^(.*)$ https://$host$1 permanent;
-
+        # 前端静态文件
         location / {
             root   /usr/share/nginx/html;
-            index  index.html index.htm;
+            index  index.html;
             try_files $uri $uri/ /index.html;
         }
 
-
+        # 后端接口转发（和你后端容器名保持一致）
         location /api/ {
-            client_max_body_size 5M;
-            rewrite ^/api/(.*) /$1 break;
-            proxy_pass http://check-in-app:8080/;
+            proxy_pass http://check-backend:8080/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-    }
-
-    # HTTPS 服务
-    server {
-        listen       443 ssl;
-        server_name  www.checkapp.asia;
-
-        # 你真实的证书路径（已修正）
-        ssl_certificate     /usr/local/nginx/https/checkapp.asia_bundle.pem;
-        ssl_certificate_key /usr/local/nginx/https/checkapp.asia.key;
-
-        ssl_session_cache    shared:SSL:1m;
-        ssl_session_timeout  5m;
-        ssl_ciphers  HIGH:!aNULL:!MD5;
-        ssl_prefer_server_ciphers  on;
-
-        location / {
-            root   /usr/share/nginx/html;
-            index  index.html index.htm;
-            try_files $uri $uri/ /index.html;
-        }
-
-        location /api/ {
-            client_max_body_size 5M;
-            proxy_pass http://check-in-app:8080/;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
         }
     }
 }

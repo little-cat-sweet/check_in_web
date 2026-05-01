@@ -22,7 +22,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./check_in_web
           push: true
           tags: ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
 
@@ -47,7 +47,7 @@ jobs:
               --restart always \
               -p 80:80 \
               -p 443:443 \
-              -v /usr/local/nginx/https:/usr/local/nginx/https \
+              -v /usr/share/nginx/https:/usr/share/nginx/https \
               ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
 
             echo "✅ 前端部署成功！HTTPS 已生效！"
