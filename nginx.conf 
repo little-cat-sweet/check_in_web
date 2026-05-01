@@ -29,6 +29,7 @@ http {
             try_files $uri $uri/ /index.html;
         }
 
+
         location /api/ {
             client_max_body_size 5M;
             rewrite ^/api/(.*) /$1 break;
