@@ -11,14 +11,14 @@ jobs:
       - uses: actions/checkout@v4
 
       # 🔍 Debug：查看仓库结构（关键）
-      - name: Debug repo structure
-        run: |
-          echo "当前路径:"
-          pwd
-          echo "==== 根目录 ===="
-          ls -la
-          echo "==== check_in_web 目录 ===="
-          ls -la ./check_in_web || echo "❌ 没有这个目录"
+#      - name: Debug repo structure
+#        run: |
+#          echo "当前路径:"
+#          pwd
+#          echo "==== 根目录 ===="
+#          ls -la
+#          echo "==== check_in_web 目录 ===="
+#          ls -la ./check_in_web || echo "❌ 没有这个目录"
 
       # 1. 登录腾讯云 CCR
       - name: Login to Tencent CCR
@@ -40,7 +40,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./check_in_web
+          context: .
           push: true
           tags: ccr.ccs.tencentyun.com/mark-chen/check-frontend:latest
 
