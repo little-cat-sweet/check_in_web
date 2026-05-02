@@ -33,7 +33,7 @@ http {
         location /api/ {
             client_max_body_size 5M;
             rewrite ^/api/(.*) /$1 break;
-            proxy_pass http://check-backend:8080/;
+            proxy_pass http://check-backend:8080;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
