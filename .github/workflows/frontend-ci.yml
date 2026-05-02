@@ -45,6 +45,7 @@ jobs:
               --name check-frontend \
               --network check-in \
               --restart always \
+              -e TZ=Asia/Shanghai \
               -p 80:80 \
               -p 443:443 \
               -v /usr/local/nginx/https:/usr/local/nginx/https \
