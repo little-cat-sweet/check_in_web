@@ -5,34 +5,38 @@ import { message, Space, Table } from 'antd';
 
 const columns = (handleConfirmComplete, cancel) => [
     {
-        title: 'Name',
+        title: '标题',
         dataIndex: 'name',
         key: 'name',
         render: (text) => text,
+        width: '25%',
     },
     {
-        title: 'Description',
+        title: '内容',
         dataIndex: 'description',
         key: 'description',
+        width: '25%',
     },
     {
-        title: 'Status',
+        title: '状态',
         dataIndex: 'status',
         key: 'status',
+        width: '25%',
         render: (status) => {
-            return status === 1 ? '完成' : '未完成';
+            return status === 1 ? '已完成' : '未完成';
         },
     },
     {
-        title: 'Action',
+        title: '操作',
         key: 'action',
+        width: '25%',
         render: (_, record) => (
             <Space size="middle">
                 {record.status === 0 && (
-                    <a onClick={() => handleConfirmComplete(record.id)}>Confirm Complete</a>
+                    <a onClick={() => handleConfirmComplete(record.id)}>标记完成</a>
                 )}
                 {record.status === 1 && (
-                    <a onClick={() => cancel(record.id)}>undo</a>
+                    <a onClick={() => cancel(record.id)}>取消完成</a>
                 )}
             </Space>
         ),
@@ -54,8 +58,9 @@ const TargetItemContainer = () => {
         const res = await httpUtil.postRequest('/targetItem/confirmSuccess?id=' + id);
         if (res.success) {
             await flushTargetItems();
+            message.success("标记完成成功");
         } else {
-            message.error("confirm failed.");
+            message.error("标记完成失败");
         }
     };
 
@@ -63,8 +68,9 @@ const TargetItemContainer = () => {
         const res = await httpUtil.postRequest('/targetItem/cancel?id=' + id);
         if (res.success) {
             await flushTargetItems();
+            message.success("取消完成成功");
         } else {
-            message.error("cancel failed.");
+            message.error("取消完成失败");
         }
     };
 
@@ -75,7 +81,7 @@ const TargetItemContainer = () => {
             setTargetItems(res.data);
             setTotal(res.pagination.total);
         } else {
-            message.error("fetch error");
+            message.error("获取数据失败");
         }
     };
 
@@ -95,7 +101,8 @@ const TargetItemContainer = () => {
                     setTotal(res.pagination.total);
                 }
             } catch (error) {
-                console.error("Error fetching date:", error);
+                console.error("获取数据错误:", error);
+                message.error("获取数据错误");
             }
         };
         fetchDate();

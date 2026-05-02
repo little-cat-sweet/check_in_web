@@ -31,7 +31,15 @@ const CustomFooter = () => {
                 </Col>
                 <Col span={24}>
                     <Text style={{ color: '#ccc' }}>
-                        © 2025 打卡小工具@all rights
+                        © 2025 打卡小工具@all rights reserved |
+                        <a
+                            href="https://beian.miit.gov.cn/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: '#ccc', marginLeft: '8px' }}
+                        >
+                            蜀ICP备2025170162号
+                        </a>
                     </Text>
                 </Col>
             </Row>

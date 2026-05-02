@@ -12,7 +12,6 @@ axiosInstance.interceptors.request.use(
         const token = localStorage.getItem('authorization');
         if (token) {
             config.headers['Authorization'] = `${token}`;
-            console.log('完整请求路径:', config.baseURL + config.url);
         }
 
         // 如果请求体是 FormData 类型，则不设置 Content-Type，让浏览器自动处理
@@ -30,8 +29,6 @@ axiosInstance.interceptors.request.use(
 // POST 请求示例
 export const postRequest = async (endpoint, data) => {
     try {
-        console.log("called -> " + endpoint);
-        console.log("user token -> " + localStorage.getItem('authorization'));
         const response = await axiosInstance.post(endpoint, data);
         return response.data;
     } catch (error) {
@@ -43,8 +40,6 @@ export const postRequest = async (endpoint, data) => {
 // GET 请求示例
 export const getRequest = async (endpoint) => {
     try {
-        console.log("called -> " + endpoint);
-        console.log("user token -> " + localStorage.getItem('authorization'));
         const response = await axiosInstance.get(endpoint);
         return response.data;
     } catch (error) {

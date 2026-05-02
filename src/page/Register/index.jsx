@@ -1,4 +1,4 @@
-import { Button, Form, Input, message, Upload } from 'antd';
+import { Button, Form, Input, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import httpUtil from '../../util/HttpUtil';
@@ -7,37 +7,21 @@ const Register = () => {
     const [form] = Form.useForm();
     const [isMessageInitialized, setMessageInitialized] = useState(false);
     const [email, setEmail] = useState("");
+    const [code, setCode] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [name, setName] = useState("");
-    const [headImage, setHeadImage] = useState(null); // 存储图片对象
 
     useEffect(() => {
         console.log("password", password);
         console.log("confirmPassword", confirmPassword);
     }, [password, confirmPassword]);
 
-    const beforeUpload = (file) => {
-        const isValidType = file.type === 'image/jpeg' || file.type === 'image/png';
-        if (!isValidType) {
-            message.error('只能上传 JPG/PNG 格式的图片!');
-            return Upload.LIST_IGNORE;
-        }
-        const isValidSize = file.size / 1024 / 1024 < 5; // 限制为 5MB
-        if (!isValidSize) {
-            message.error('图片大小不能超过 5MB!');
-            return Upload.LIST_IGNORE;
-        }
-
-        // 设置图片文件
-        setHeadImage(file);
-        return false; // 返回 false 阻止自动上传
-    };
-
     const register = async () => {
         const nameValue = name;
         const emailValue = email;
         const passwordValue = password;
+        const codeValue = code;
 
         if (confirmPassword !== passwordValue) {
             message.warning("密码不一致，请重新输入！");
@@ -51,12 +35,7 @@ const Register = () => {
         formData.append('name', nameValue);
         formData.append('email', emailValue);
         formData.append('password', passwordValue);
-
-        if (headImage) {
-            formData.append('headImage', headImage); // 添加头像文件
-        }
-
-        console.log("ssss" + formData.toString())
+        formData.append('code', codeValue);
 
         try {
             const data = await httpUtil.postRequest("/user/register", formData);
@@ -83,6 +62,10 @@ const Register = () => {
         setEmail(e.target.value);
     };
 
+    const updateCode = (e) => {
+        setCode(e.target.value);
+    };
+
     const updateNameValue = (e) => {
         setName(e.target.value);
     };
@@ -95,6 +78,25 @@ const Register = () => {
         setConfirmPassword(e.target.value);
     };
 
+    const isValidEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const sendCode = async () => {
+        if (!isValidEmail(email)) {
+            message.error('请输入有效的邮箱地址');
+            return;
+        }
+
+        const data = await httpUtil.getRequest("/user/code?email=" + email);
+        if (data.success) {
+            message.info("验证码已发送至您的邮箱！");
+        } else {
+            message.info(data.message);
+        }
+    };
+
     const navigate = useNavigate();
 
     const backToLogin = () => {
@@ -102,76 +104,233 @@ const Register = () => {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <Form
-                name="basic"
-                initialValues={{ remember: true }}
-                form={form}
-                layout="vertical"
-                style={{ width: 400 }}
-            >
-                <Form.Item
-                    label="Name"
-                    name="name"
-                    rules={[{ required: true, message: '请输入姓名' }]}
-                    onChange={updateNameValue}
-                >
-                    <Input />
-                </Form.Item>
+        <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            minHeight: '100vh',
+            overflow: 'hidden',
+        }}>
+            {/* 左侧图片区域 */}
+            <div style={{
+                background: 'url(/static/images/registerLogo.jpg) no-repeat center center',
+                backgroundSize: 'cover',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                padding: '30px',
+                color: 'white',
+                position: 'relative',
+                minHeight: '100vh',
+            }}>
+                <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.4)'
+                }} />
 
-                <Form.Item
-                    label="Email"
-                    name="email"
-                    rules={[
-                        { required: true, message: '请输入邮箱地址' },
-                        { type: 'email', message: '请输入有效的邮箱地址' }
-                    ]}
-                    onChange={updateEmailValue}
-                >
-                    <Input />
-                </Form.Item>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <h1 style={{ fontSize: '28px', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>打卡小工具</h1>
+                </div>
 
-                <Form.Item
-                    label="密码"
-                    name="password"
-                    rules={[{ required: true, message: '请输入密码' }]}
-                    onChange={updatePasswordValue}
-                >
-                    <Input.Password />
-                </Form.Item>
+                <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 30px' }}>
+                    <h2 style={{ fontSize: '24px', marginBottom: '15px', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>想要规律的被催促吗？</h2>
+                    <p style={{ fontSize: '16px', lineHeight: '1.5', textShadow: '1px 1px 3px rgba(0, 0, 0, 0.5)' }}>
+                        快来使用打卡小工具，轻松记录每日任务，培养良好习惯！
+                    </p>
+                </div>
 
-                <Form.Item
-                    label="确认密码"
-                    name="confirmPassword"
-                    rules={[{ required: true, message: '请再次输入密码' }]}
-                    onChange={updateConfirmPasswordValue}
-                >
-                    <Input.Password />
-                </Form.Item>
-
-                {/* 头像上传 */}
-                <Form.Item label="头像" name="headImage">
-                    <Upload
-                        listType="picture-card"
-                        showUploadList={true}
-                        beforeUpload={beforeUpload}
-                        multiple={false}
-                    >
-                        选择头像
-                    </Upload>
-                </Form.Item>
-
-                <Form.Item>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Button htmlType="button" onClick={backToLogin}>
-                            返回登录
-                        </Button>
-                        <Button type="primary" htmlType="submit" onClick={register}>
-                            注册
-                        </Button>
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', gap: '15px' }}>
+                        <Button type="text" icon={<i className="fab fa-weixin"></i>} style={{ color: 'white', fontSize: '24px' }} />
+                        <Button type="text" icon={<i className="fab fa-weibo"></i>} style={{ color: 'white', fontSize: '24px' }} />
+                        <Button type="text" icon={<i className="fab fa-qq"></i>} style={{ color: 'white', fontSize: '24px' }} />
                     </div>
-                </Form.Item>
-            </Form>
+                </div>
+            </div>
+
+            {/* 右侧表单区域 */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                padding: '30px 50px',
+                minHeight: '100vh',
+                overflowY: 'auto',
+                backgroundColor: '#f5f5f5', // 浅灰色背景
+            }}>
+                <div style={{
+                    width: '100%',
+                    maxWidth: '400px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    backgroundColor: '#fff', // 白色表单卡片
+                    padding: '30px',
+                    borderRadius: '8px',
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                }}>
+                    <div style={{ marginBottom: '20px' }}>
+                        <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: 'bold', color: '#333' }}>创建新账号</h2>
+                        <p style={{ color: '#666' }}>
+                            已有账号？<a href="#" onClick={backToLogin} style={{ color: '#000' }}>立即登录</a>
+                        </p>
+                    </div>
+
+                    <Form
+                        name="basic"
+                        initialValues={{ remember: true }}
+                        form={form}
+                        layout="vertical"
+                        style={{ flex: 1 }}
+                    >
+                        <Form.Item
+                            label="用户名"
+                            name="name"
+                            rules={[{ required: true, message: '请输入用户名' }]}
+                            onChange={updateNameValue}
+                        >
+                            <Input
+                                placeholder="请输入用户名"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="邮箱"
+                            name="email"
+                            rules={[
+                                { required: true, message: '请输入邮箱地址' },
+                                { type: 'email', message: '请输入有效的邮箱地址' }
+                            ]}
+                            onChange={updateEmailValue}
+                        >
+                            <Input
+                                placeholder="请输入邮箱地址"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="验证码"
+                            name="code"
+                            rules={[
+                                { required: true, message: '请输入验证码' },
+                            ]}
+                            onChange={updateCode}
+                        >
+                            <Input
+                                placeholder="请输入验证码"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
+                        </Form.Item>
+
+                        <Form.Item>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Button
+                                    type="primary"
+                                    onClick={sendCode}
+                                    style={{
+                                        backgroundColor: '#000', // 黑色按钮
+                                        borderColor: '#000',
+                                        height: '40px',
+                                        borderRadius: '4px',
+                                    }}
+                                >
+                                    获取验证码
+                                </Button>
+                            </div>
+                        </Form.Item>
+
+                        <Form.Item
+                            label="密码"
+                            name="password"
+                            rules={[
+                                { required: true, message: '请输入密码' },
+                                { min: 6, message: '密码长度至少为6位' }
+                            ]}
+                            onChange={updatePasswordValue}
+                        >
+                            <Input.Password
+                                placeholder="请输入密码"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="确认密码"
+                            name="confirmPassword"
+                            rules={[
+                                { required: true, message: '请再次输入密码' },
+                                { validator: (_, value) => {
+                                        if (!value || value === password) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error('两次输入的密码不一致'));
+                                    }
+                                }
+                            ]}
+                            onChange={updateConfirmPasswordValue}
+                        >
+                            <Input.Password
+                                placeholder="请再次输入密码"
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    padding: '0 12px',
+                                }}
+                            />
+                        </Form.Item>
+
+                        <Form.Item style={{ marginTop: 'auto' }}>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                onClick={register}
+                                style={{
+                                    width: '100%',
+                                    height: '40px',
+                                    backgroundColor: '#000',
+                                    borderColor: '#000',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    borderRadius: '4px',
+                                }}
+                            >
+                                立即注册
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </div>
+            </div>
         </div>
     );
 };
