@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { message } from 'antd';
 const baseUrl = process.env.REACT_APP_BASE_URL;
 
 // 创建 axios 实例
@@ -26,6 +27,29 @@ axiosInstance.interceptors.request.use(
     }
 );
 
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        // 1. 如果是 401 登录超时
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('authorization');
+            message.error('登录超时，请重新登录');
+
+            // 2. 延迟跳转
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 800);
+
+            // 3. 返回一个 永远 pending 的 Promise，中断所有后续逻辑
+            // 这样就不会进入业务代码的 catch！！！
+            return new Promise(() => {});
+        }
+
+        // 其他错误正常抛出
+        return Promise.reject(error);
+    }
+);
+
 // POST 请求示例
 export const postRequest = async (endpoint, data) => {
     try {
@@ -48,7 +72,9 @@ export const getRequest = async (endpoint) => {
     }
 };
 
-export default {
+const httpUtil = {
     getRequest,
     postRequest
 };
+
+export default httpUtil;
