@@ -1,24 +1,24 @@
 import {useEffect, useState} from "react";
 import httpUtil from "../../util/HttpUtil";
-import {Button, Col, Flex, Input, Layout, message, Modal, Row, Select, Table} from "antd";
+import {Button, Col, Flex, Form, Input, Layout, message, Modal, Row, Select, Table} from "antd";
 import {Content, Header} from "antd/es/layout/layout";
 
 const headerStyle = {
     textAlign: 'center',
-    color: '#000', // 黑色文字
+    color: '#000',
     height: 64,
     paddingInline: 48,
     lineHeight: '64px',
-    backgroundColor: '#fff', // 白色背景
-    borderBottom: '1px solid #000', // 黑色边框
+    backgroundColor: '#fff',
+    borderBottom: '1px solid #000',
 };
 
 const contentStyle = {
     textAlign: 'center',
     minHeight: 120,
     lineHeight: '120px',
-    color: '#000', // 黑色文字
-    backgroundColor: '#fff', // 白色背景
+    color: '#000',
+    backgroundColor: '#fff',
     padding: '20px',
 };
 
@@ -27,16 +27,13 @@ const layoutStyle = {
     overflow: 'hidden',
     width: 'calc(100% - 8px)',
     maxWidth: 'calc(100% - 8px)',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', // 黑色阴影
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
 };
 
 const Target = () => {
-
+    const [form] = Form.useForm();
     const [targets, setTargets] = useState([])
     const [visible, setVisible] = useState(false);
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [day, setDay] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(6);
     const [total, setTotal] = useState(0);
@@ -60,23 +57,9 @@ const Target = () => {
         setVisible(true);
     };
 
-    const handleName = (e) => {
-        setName(e.target.value);
-    };
-
-    const handleDescription = (e) => {
-        setDescription(e.target.value)
-    }
-
-    const handleDay = (e) => {
-        setDay(e)
-    }
-
     const handleCancel = () => {
         setVisible(false);
-        setName('');
-        setDescription('')
-        setDay(0);
+        form.resetFields();
     };
 
     const flushData = async () => {
@@ -89,24 +72,14 @@ const Target = () => {
         }
     }
 
-    const addTarget = async () => {
-        const target = {};
-        if (null === name || '' === name) {
-            message.warning("请输入名称");
-            return;
-        }
-        target.name = name;
-        target.description = description;
-        target.day = day;
-
-        const res = await httpUtil.postRequest("/target/add", target);
+    const addTarget = async (values) => {
+        const res = await httpUtil.postRequest("/target/add", values);
         if (res.success) {
             message.info("添加成功")
             await flushData()
             handleCancel();
         } else {
             message.error(res.message || "添加失败");
-            handleCancel();
         }
     }
 
@@ -181,97 +154,53 @@ const Target = () => {
                                     title="添加目标"
                                     visible={visible}
                                     onCancel={handleCancel}
-                                    footer={[
-                                        <Button
-                                            key="cancel"
-                                            onClick={handleCancel}
-                                            style={{
-                                                backgroundColor: '#000',
-                                                color: '#fff',
-                                                borderColor: '#000',
-                                                marginRight: 8
-                                            }}
-                                        >
-                                            取消
-                                        </Button>,
-                                        <Button
-                                            key="confirm"
-                                            type="primary"
-                                            onClick={addTarget}
-                                            style={{
-                                                backgroundColor: '#000',
-                                                color: '#fff',
-                                                borderColor: '#000'
-                                            }}
-                                        >
-                                            确认
-                                        </Button>
-                                    ]}
+                                    footer={null}
                                     style={{ borderRadius: 8 }}
                                     bodyStyle={{ padding: 24 }}
                                 >
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                        <div>
-                                            <div style={{
-                                                marginBottom: 8,
-                                                fontSize: 14,
-                                                fontWeight: 500,
-                                                color: '#333'
-                                            }}>
-                                                目标标题
-                                            </div>
+                                    <Form
+                                        form={form}
+                                        layout="vertical"
+                                        onFinish={addTarget}
+                                    >
+                                        <Form.Item
+                                            label="目标标题"
+                                            name="name"
+                                            rules={[
+                                                { required: true, message: '请输入目标标题' },
+                                                { max: 29, message: '标题已达到最大长度30个字符' }
+                                            ]}
+                                        >
                                             <Input
                                                 placeholder="请输入目标标题"
-                                                value={name}
-                                                onChange={handleName}
-                                                style={{
-                                                    height: 40,
-                                                    borderRadius: 4,
-                                                    borderColor: '#ddd'
-                                                }}
+                                                maxLength={30}
+                                                style={{ height: 40, borderRadius: 4, borderColor: '#ddd' }}
                                             />
-                                        </div>
+                                        </Form.Item>
 
-                                        <div>
-                                            <div style={{
-                                                marginBottom: 8,
-                                                fontSize: 14,
-                                                fontWeight: 500,
-                                                color: '#333'
-                                            }}>
-                                                目标内容
-                                            </div>
+                                        <Form.Item
+                                            label="目标内容"
+                                            name="description"
+                                            rules={[
+                                                { required: true, message: '请输入目标内容' },
+                                                { max: 29, message: '内容已达到最大长度30个字符' }
+                                            ]}
+                                        >
                                             <Input
                                                 placeholder="请输入目标内容"
-                                                value={description}
-                                                onChange={handleDescription}
-                                                style={{
-                                                    height: 40,
-                                                    borderRadius: 4,
-                                                    borderColor: '#ddd'
-                                                }}
+                                                maxLength={30}
+                                                style={{ height: 40, borderRadius: 4, borderColor: '#ddd' }}
                                             />
-                                        </div>
+                                        </Form.Item>
 
-                                        <div>
-                                            <div style={{
-                                                marginBottom: 8,
-                                                fontSize: 14,
-                                                fontWeight: 500,
-                                                color: '#333'
-                                            }}>
-                                                提醒频率
-                                            </div>
+                                        <Form.Item
+                                            label="提醒频率"
+                                            name="day"
+                                            rules={[{ required: true, message: '请选择提醒频率' }]}
+                                        >
                                             <Select
                                                 placeholder="选择提醒频率"
-                                                value={day}
-                                                onChange={handleDay}
-                                                style={{
-                                                    width: '100%',
-                                                    height: 40,
-                                                    borderRadius: 4,
-                                                    borderColor: '#ddd'
-                                                }}
+                                                style={{ width: '100%', height: 40, borderRadius: 4, borderColor: '#ddd' }}
                                             >
                                                 {dayOptions.map((option) => (
                                                     <Select.Option key={option.value} value={option.value}>
@@ -279,11 +208,28 @@ const Target = () => {
                                                     </Select.Option>
                                                 ))}
                                             </Select>
-                                        </div>
-                                    </div>
+                                        </Form.Item>
+
+                                        <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+                                            <Button
+                                                key="cancel"
+                                                onClick={handleCancel}
+                                                style={{ backgroundColor: '#000', color: '#fff', borderColor: '#000', marginRight: 8 }}
+                                            >
+                                                取消
+                                            </Button>
+                                            <Button
+                                                key="confirm"
+                                                type="primary"
+                                                htmlType="submit"
+                                                style={{ backgroundColor: '#000', color: '#fff', borderColor: '#000' }}
+                                            >
+                                                确认
+                                            </Button>
+                                        </Form.Item>
+                                    </Form>
                                 </Modal>
                             </Col>
-                            <Col span={16}></Col>
                         </Row>
                     </Header>
                     <Content style={{...contentStyle, lineHeight: 'normal', padding: 20}}>
@@ -291,7 +237,8 @@ const Target = () => {
                     </Content>
                 </Layout>
             </Flex>
-        </div>)
+        </div>
+    )
 }
 
 export default Target;

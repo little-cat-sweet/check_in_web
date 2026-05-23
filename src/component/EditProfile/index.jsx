@@ -97,11 +97,18 @@ const EditProfile = () => {
                         <Form.Item
                             label="用户名"
                             name="name"
-                            rules={[{ required: true }]}
+                            rules={[
+                                { required: true, message: '请输入用户名' },
+                                { max: 29, message: '用户名已达到最大长度30个字符' }
+                            ]}
                             labelCol={{ span: 24, style: { textAlign: 'left' } }}
                             wrapperCol={{ span: 24 }}
                         >
-                            <Input placeholder="请输入用户名" style={{ borderRadius: 8 }} />
+                            <Input
+                                placeholder="请输入用户名"
+                                maxLength={30}
+                                style={{ borderRadius: 8 }}
+                            />
                         </Form.Item>
 
                         <Form.Item
@@ -109,12 +116,18 @@ const EditProfile = () => {
                             name="email"
                             rules={[
                                 { required: true },
-                                { type: 'email', message: '请输入有效的邮箱地址' }
+                                { type: 'email', message: '请输入有效的邮箱地址' },
+                                { max: 29, message: '邮箱已达到最大长度30个字符' }
                             ]}
                             labelCol={{ span: 24, style: { textAlign: 'left' } }}
                             wrapperCol={{ span: 24 }}
                         >
-                            <Input placeholder="请输入邮箱" disabled style={{ borderRadius: 8 }} />
+                            <Input
+                                placeholder="请输入邮箱"
+                                disabled
+                                maxLength={30}
+                                style={{ borderRadius: 8 }}
+                            />
                         </Form.Item>
 
                         <Form.Item>

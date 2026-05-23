@@ -189,11 +189,15 @@ const Register = () => {
                         <Form.Item
                             label="用户名"
                             name="name"
-                            rules={[{ required: true, message: '请输入用户名' }]}
+                            rules={[
+                                { required: true, message: '请输入用户名' },
+                                { max: 29, message: '用户名已达到最大长度30个字符' }
+                            ]}
                             onChange={updateNameValue}
                         >
                             <Input
                                 placeholder="请输入用户名"
+                                maxLength={30}
                                 style={{
                                     width: '100%',
                                     height: '40px',
@@ -209,12 +213,14 @@ const Register = () => {
                             name="email"
                             rules={[
                                 { required: true, message: '请输入邮箱地址' },
-                                { type: 'email', message: '请输入有效的邮箱地址' }
+                                { type: 'email', message: '请输入有效的邮箱地址' },
+                                { max: 29, message: '邮箱已达到最大长度30个字符' }
                             ]}
                             onChange={updateEmailValue}
                         >
                             <Input
                                 placeholder="请输入邮箱地址"
+                                maxLength={30}
                                 style={{
                                     width: '100%',
                                     height: '40px',
@@ -230,11 +236,13 @@ const Register = () => {
                             name="code"
                             rules={[
                                 { required: true, message: '请输入验证码' },
+                                { max: 29, message: '验证码已达到最大长度30个字符' }
                             ]}
                             onChange={updateCode}
                         >
                             <Input
                                 placeholder="请输入验证码"
+                                maxLength={30}
                                 style={{
                                     width: '100%',
                                     height: '40px',
@@ -267,12 +275,14 @@ const Register = () => {
                             name="password"
                             rules={[
                                 { required: true, message: '请输入密码' },
-                                { min: 6, message: '密码长度至少为6位' }
+                                { min: 6, message: '密码长度至少为6位' },
+                                { max: 29, message: '密码已达到最大长度30个字符' }
                             ]}
                             onChange={updatePasswordValue}
                         >
                             <Input.Password
                                 placeholder="请输入密码"
+                                maxLength={30}
                                 style={{
                                     width: '100%',
                                     height: '40px',
@@ -288,6 +298,7 @@ const Register = () => {
                             name="confirmPassword"
                             rules={[
                                 { required: true, message: '请再次输入密码' },
+                                { max: 29, message: '确认密码已达到最大长度30个字符' },
                                 { validator: (_, value) => {
                                         if (!value || value === password) {
                                             return Promise.resolve();
@@ -300,6 +311,7 @@ const Register = () => {
                         >
                             <Input.Password
                                 placeholder="请再次输入密码"
+                                maxLength={30}
                                 style={{
                                     width: '100%',
                                     height: '40px',

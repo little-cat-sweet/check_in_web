@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import httpUtil from '../../util/HttpUtil';
 
 const Update = () => {
+    const [form] = Form.useForm();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [code, setCode] = useState("");
@@ -89,6 +90,7 @@ const Update = () => {
                         输入您注册时使用的邮箱地址
                     </p>
                     <Form
+                        form={form}
                         name="basic"
                         initialValues={{ remember: true }}
                     >
@@ -97,12 +99,14 @@ const Update = () => {
                             name="email"
                             rules={[
                                 { required: true, message: '请输入您的邮箱!' },
-                                { type: 'email', message: '请输入有效的邮箱地址!' }
+                                { type: 'email', message: '请输入有效的邮箱地址!' },
+                                { max: 29, message: '邮箱已达到最大长度30个字符' }
                             ]}
                         >
                             <Input
                                 placeholder="输入您的邮箱"
                                 onChange={(e) => setEmail(e.target.value)}
+                                maxLength={30}
                                 style={{
                                     width: '100%',
                                     height: '40px',
@@ -116,11 +120,15 @@ const Update = () => {
                         <Form.Item
                             label="验证码"
                             name="code"
-                            rules={[{ required: true, message: '请输入验证码' }]}
+                            rules={[
+                                { required: true, message: '请输入验证码' },
+                                { max: 29, message: '验证码已达到最大长度30个字符' }
+                            ]}
                         >
                             <Input
                                 placeholder="输入验证码"
                                 onChange={(e) => setCode(e.target.value)}
+                                maxLength={30}
                                 style={{
                                     width: '100%',
                                     height: '40px',
@@ -151,11 +159,15 @@ const Update = () => {
                         <Form.Item
                             label="新密码"
                             name="newPassword"
-                            rules={[{ required: true, message: '请输入新密码' }]}
+                            rules={[
+                                { required: true, message: '请输入新密码' },
+                                { max: 29, message: '新密码已达到最大长度30个字符' }
+                            ]}
                         >
                             <Input.Password
                                 placeholder="输入新密码"
                                 onChange={(e) => setPassword(e.target.value)}
+                                maxLength={30}
                                 style={{
                                     width: '100%',
                                     height: '40px',
