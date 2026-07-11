@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, message, Modal, Table } from 'antd';
 import httpUtil from "../../util/HttpUtil";
 import moment from 'moment';
 import './index.css';
+import { Calendar, Col, message, Modal, Radio, Row, Select, Table } from 'antd';
 
 const Conclusion = () => {
     const [conclusionItems, setConclusionItems] = useState([]);
@@ -104,9 +104,51 @@ const Conclusion = () => {
         },
     ];
 
+    const headerRender = ({ value, type, onChange, onTypeChange }) => {
+        const current = value.clone();
+        const years = [today.clone().subtract(1, 'year').year(), today.year()];
+        const months = moment.monthsShort();
+
+        return (
+            <Row gutter={8} justify="end">
+                <Col>
+                    <Select
+                        size="small"
+                        value={current.year()}
+                        options={years.map(year => ({ label: year, value: year }))}
+                        onChange={year => onChange(current.clone().year(year))}
+                    />
+                </Col>
+                <Col>
+                    <Select
+                        size="small"
+                        value={current.month()}
+                        options={months.map((month, index) => ({ label: month, value: index }))}
+                        onChange={month => onChange(current.clone().month(month))}
+                    />
+                </Col>
+                <Col>
+                    <Radio.Group
+                        size="small"
+                        value={type}
+                        onChange={event => onTypeChange(event.target.value)}
+                    >
+                        <Radio.Button value="month">Month</Radio.Button>
+                        <Radio.Button value="year">Year</Radio.Button>
+                    </Radio.Group>
+                </Col>
+            </Row>
+        );
+    };
+
     return (
         <>
-            <Calendar cellRender={cellRender} disabledDate={disabledDate}/>
+            {/*<Calendar cellRender={cellRender} disabledDate={disabledDate}/>*/}
+            <Calendar
+                cellRender={cellRender}
+                disabledDate={disabledDate}
+                headerRender={headerRender}
+            />
             <Modal
                 title="项目详情"
                 visible={visible}
