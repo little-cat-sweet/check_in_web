@@ -49,8 +49,8 @@ const TargetItemContainer = () => {
     const [pageSize, setPageSize] = useState(6);
     const [total, setTotal] = useState(0);
 
-    const getTargetItemsByTime = async (time) => {
-        const url = `/targetItem/showTargetItemVo?time=${time}&pageNum=${currentPage}&pageSize=${pageSize}`;
+    const getTargetItemsByTime = async (time, pageNum = currentPage, size = pageSize) => {
+        const url = `/targetItem/showTargetItemVo?time=${time}&pageNum=${pageNum}&pageSize=${size}`;
         return await httpUtil.getRequest(url);
     };
 
@@ -74,9 +74,9 @@ const TargetItemContainer = () => {
         }
     };
 
-    const flushTargetItems = async () => {
+    const flushTargetItems = async (pageNum = currentPage, size = pageSize) => {
         const time = await dateUtil.getNowDate();
-        const res = await getTargetItemsByTime(time);
+        const res = await getTargetItemsByTime(time, pageNum, size);
         if (res.success) {
             setTargetItems(res.data);
             setTotal(res.pagination.total);
@@ -85,10 +85,10 @@ const TargetItemContainer = () => {
         }
     };
 
-    const handleTableChange = (pagination) => {
-        setCurrentPage(pagination.current);
-        setPageSize(pagination.pageSize);
-        flushTargetItems();
+    const handleTableChange = (pageNum, size) => {
+        setCurrentPage(pageNum);
+        setPageSize(size);
+        flushTargetItems(pageNum, size);
     };
 
     useEffect(() => {
@@ -113,11 +113,6 @@ const TargetItemContainer = () => {
         pageSize: pageSize,
         total: total,
         onChange: handleTableChange,
-        onShowSizeChange: (current, size) => {
-            setCurrentPage(current);
-            setPageSize(size);
-            flushTargetItems();
-        },
     };
 
     return (
