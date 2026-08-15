@@ -62,8 +62,8 @@ const Target = () => {
         form.resetFields();
     };
 
-    const flushData = async () => {
-        const res = await httpUtil.getRequest(`/target/findTargets?pageNum=${currentPage}&pageSize=${pageSize}`);
+    const flushData = async (pageNum = currentPage, size = pageSize) => {
+        const res = await httpUtil.getRequest(`/target/findTargets?pageNum=${pageNum}&pageSize=${size}`);
         if (res.success) {
             setTargets(res.data);
             setTotal(res.pagination.total)
@@ -123,7 +123,12 @@ const Target = () => {
     const handleDelete = async (e) => {
         const res = await httpUtil.postRequest("/target/delete?id=" + e.id);
         if (res.success) {
-            await flushData();
+            const nextPage = targets.length === 1 && currentPage > 1
+                ? currentPage - 1
+                : currentPage;
+
+            setCurrentPage(nextPage);
+            await flushData(nextPage, pageSize);
             message.info("删除成功")
         } else {
             message.error(res.message || "删除失败")

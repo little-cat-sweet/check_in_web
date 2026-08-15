@@ -3,6 +3,9 @@ import httpUtil from "../../util/HttpUtil";
 import dateUtil from "../../util/DateUtil";
 import { message, Space, Table } from 'antd';
 
+const DEFAULT_PAGE = 1;
+const DEFAULT_PAGE_SIZE = 6;
+
 const columns = (handleConfirmComplete, cancel) => [
     {
         title: '标题',
@@ -45,11 +48,11 @@ const columns = (handleConfirmComplete, cancel) => [
 
 const TargetItemContainer = () => {
     const [targetItems, setTargetItems] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(6);
+    const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE);
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
     const [total, setTotal] = useState(0);
 
-    const getTargetItemsByTime = async (time, pageNum = currentPage, size = pageSize) => {
+    const getTargetItemsByTime = async (time, pageNum, size) => {
         const url = `/targetItem/showTargetItemVo?time=${time}&pageNum=${pageNum}&pageSize=${size}`;
         return await httpUtil.getRequest(url);
     };
@@ -75,8 +78,10 @@ const TargetItemContainer = () => {
     };
 
     const flushTargetItems = async (pageNum = currentPage, size = pageSize) => {
+        const safePageNum = Number.isInteger(pageNum) && pageNum > 0 ? pageNum : DEFAULT_PAGE;
+        const safePageSize = Number.isInteger(size) && size > 0 ? size : DEFAULT_PAGE_SIZE;
         const time = await dateUtil.getNowDate();
-        const res = await getTargetItemsByTime(time, pageNum, size);
+        const res = await getTargetItemsByTime(time, safePageNum, safePageSize);
         if (res.success) {
             setTargetItems(res.data);
             setTotal(res.pagination.total);
@@ -85,7 +90,14 @@ const TargetItemContainer = () => {
         }
     };
 
-    const handleTableChange = (pageNum, size) => {
+    const handleTableChange = (pagination) => {
+        const pageNum = Number.isInteger(pagination?.current) && pagination.current > 0
+            ? pagination.current
+            : DEFAULT_PAGE;
+        const size = Number.isInteger(pagination?.pageSize) && pagination.pageSize > 0
+            ? pagination.pageSize
+            : DEFAULT_PAGE_SIZE;
+
         setCurrentPage(pageNum);
         setPageSize(size);
         flushTargetItems(pageNum, size);
@@ -95,7 +107,7 @@ const TargetItemContainer = () => {
         const fetchDate = async () => {
             try {
                 const time = await dateUtil.getNowDate();
-                const res = await getTargetItemsByTime(time);
+                const res = await getTargetItemsByTime(time, DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
                 if (res.success) {
                     setTargetItems(res.data);
                     setTotal(res.pagination.total);
@@ -112,7 +124,6 @@ const TargetItemContainer = () => {
         current: currentPage,
         pageSize: pageSize,
         total: total,
-        onChange: handleTableChange,
     };
 
     return (
@@ -122,6 +133,7 @@ const TargetItemContainer = () => {
                 dataSource={targetItems}
                 rowKey="id"
                 pagination={paginationConfig}
+                onChange={handleTableChange}
             />
         </div>
     );
