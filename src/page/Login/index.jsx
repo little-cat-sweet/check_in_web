@@ -1,154 +1,123 @@
-import { Form, Input, Button } from 'antd';
-import { message } from 'antd';
 import React, { useState } from 'react';
+import { App as AntApp, Button, Form, Input } from 'antd';
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import AuthShell from '../../component/AuthShell';
 import httpUtil from '../../util/HttpUtil';
 
 const Login = () => {
-    const [form] = Form.useForm();
-    const [isMessageInitialized, setMessageInitialized] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { message } = AntApp.useApp();
 
-    if (!isMessageInitialized) {
-        message.config({ maxCount: 1 });
-        setMessageInitialized(true);
-    }
-
-    const onFinish = async (values) => {
-        const { email, password } = values;
+    const onFinish = async ({ email, password }) => {
+        setLoading(true);
         try {
-            const data = await httpUtil.postRequest(`/user/login?email=${email}&password=${password}`, null);
+            const data = await httpUtil.postRequest(
+                `/user/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+                null
+            );
+
             if (data.success === true) {
-                localStorage.setItem("authorization", data.data);
-                message.info("登录成功！");
+                localStorage.setItem('authorization', data.data);
+                message.success('登录成功，欢迎回来');
                 navigate('/main');
             } else {
-                message.warning(data.message || "登录失败，请检查邮箱和密码");
+                message.warning(data.message || '登录失败，请检查邮箱和密码');
             }
-        } catch (e) {
-            message.error("网络错误，请联系管理员！");
+        } catch (error) {
+            message.error('网络异常，请稍后重试');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const onFinishFailed = (errorInfo) => {
-        message.error('表单验证失败');
-    };
-
-    const handleUpdatePassword = () => navigate('/update');
-    const goToRegister = () => navigate('/register');
-
     return (
-        <div style={{ display: 'flex', height: '100vh' }}>
-            <div style={{
-                flex: 1,
-                padding: '50px',
-                backgroundColor: '#f5f5f5',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}>
-                <div style={{
-                    width: '100%',
-                    maxWidth: '400px',
-                    backgroundColor: '#fff',
-                    padding: '30px',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                        <img src="/static/images/loginPageLogo.jpg" alt="Logo" style={{ width: '30px', marginRight: '10px' }} />
-                        <span>打卡小工具！</span>
-                    </div>
-                    <h1>嗨，欢迎回来</h1>
-                    <p>欢迎回到您的专属空间</p>
+        <AuthShell
+            image="/static/images/loginPageRight.jpg"
+            quote={
+                <>
+                    把每一天的小事做好，
+                    <br />
+                    就是了不起的坚持。
+                </>
+            }
+            caption="DAILY CHECK-IN"
+        >
+            <h1 className="auth__title">欢迎回来</h1>
+            <p className="auth__sub">登录后继续你的每日打卡</p>
 
-                    <Form
-                        form={form}
-                        name="basic"
-                        initialValues={{ remember: true }}
-                        onFinish={onFinish}
-                        onFinishFailed={onFinishFailed}
-                        validateFirst
+            <Form
+                name="login"
+                layout="vertical"
+                size="large"
+                requiredMark={false}
+                onFinish={onFinish}
+            >
+                <Form.Item
+                    name="email"
+                    label="邮箱"
+                    rules={[
+                        { required: true, message: '请输入邮箱' },
+                        { type: 'email', message: '请输入有效的邮箱地址' },
+                        { max: 30, message: '邮箱最多 30 个字符' },
+                    ]}
+                >
+                    <Input
+                        prefix={<MailOutlined />}
+                        placeholder="you@example.com"
+                        autoComplete="email"
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    name="password"
+                    label="密码"
+                    rules={[
+                        { required: true, message: '请输入密码' },
+                        { max: 30, message: '密码最多 30 个字符' },
+                    ]}
+                >
+                    <Input.Password
+                        prefix={<LockOutlined />}
+                        placeholder="输入登录密码"
+                        autoComplete="current-password"
+                    />
+                </Form.Item>
+
+                <div className="auth__row">
+                    <button
+                        type="button"
+                        className="auth-link"
+                        onClick={() => navigate('/update')}
                     >
-                        <Form.Item
-                            name="email"
-                            rules={[
-                                { required: true, message: '请输入您的邮箱！' },
-                                { type: 'email', message: '请输入有效的邮箱地址！' },
-                                { max: 29, message: '邮箱已达到最大长度30个字符' }
-                            ]}
-                        >
-                            <Input
-                                placeholder="邮箱"
-                                maxLength={30}
-                                style={{
-                                    width: '100%',
-                                    height: '40px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    padding: '0 12px',
-                                }}
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            name="password"
-                            rules={[
-                                { required: true, message: '请输入您的密码！' },
-                                { max: 29, message: '密码已达到最大长度30个字符' }
-                            ]}
-                        >
-                            <Input.Password
-                                placeholder="密码"
-                                maxLength={30}
-                                style={{
-                                    width: '100%',
-                                    height: '40px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    padding: '0 12px',
-                                }}
-                            />
-                        </Form.Item>
-
-                        <Form.Item>
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                style={{
-                                    width: '100%',
-                                    height: '40px',
-                                    backgroundColor: '#000',
-                                    borderColor: '#000',
-                                    fontSize: '16px',
-                                    fontWeight: 'bold',
-                                    borderRadius: '4px',
-                                }}
-                            >
-                                登录
-                            </Button>
-                            <a
-                                href="javascript:void(0);"
-                                style={{ float: 'right', marginTop: '10px', color: '#000' }}
-                                onClick={handleUpdatePassword}
-                            >
-                                忘记密码?
-                            </a>
-                        </Form.Item>
-                    </Form>
-
-                    <p style={{ marginTop: '20px' }}>
-                        还没有账号? <a href="#" onClick={goToRegister} style={{ color: '#000' }}>立即注册</a>
-                    </p>
+                        忘记密码？
+                    </button>
                 </div>
-            </div>
-            <div style={{
-                flex: 1,
-                background: 'url(/static/images/loginPageRight.jpg) no-repeat center center',
-                backgroundSize: 'cover'
-            }}></div>
-        </div>
+
+                <Button
+                    className="auth__submit"
+                    type="primary"
+                    htmlType="submit"
+                    size="large"
+                    block
+                    loading={loading}
+                >
+                    登录
+                </Button>
+            </Form>
+
+            <p className="auth__foot">
+                还没有账号？
+                <button
+                    type="button"
+                    className="auth-link auth-link--strong"
+                    onClick={() => navigate('/register')}
+                >
+                    立即注册
+                </button>
+            </p>
+        </AuthShell>
     );
 };
 

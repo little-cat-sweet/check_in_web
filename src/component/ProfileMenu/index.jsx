@@ -1,17 +1,39 @@
 import React from 'react';
-import { Menu } from 'antd';
+import { Dropdown } from 'antd';
+import {
+    DownOutlined,
+    EditOutlined,
+    LogoutOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
 
-const ProfileMenu = ({ onEdit, onLogout }) => {
+const menuItems = [
+    { key: 'editProfile', icon: <EditOutlined />, label: '编辑个人资料' },
+    { type: 'divider' },
+    { key: 'logout', icon: <LogoutOutlined />, label: '退出登录', danger: true },
+];
+
+const ProfileMenu = ({ name, onEdit, onLogout }) => {
+    const handleMenuClick = ({ key }) => {
+        if (key === 'editProfile') onEdit?.();
+        if (key === 'logout') onLogout?.();
+    };
+
     return (
-        <Menu
-            onClick={({ key }) => {
-                if (key === 'editProfile') onEdit?.();
-                if (key === 'logout') onLogout?.();
-            }}
+        <Dropdown
+            menu={{ items: menuItems, onClick: handleMenuClick }}
+            placement="bottomRight"
+            trigger={['click']}
+            arrow={{ pointAtCenter: true }}
         >
-            <Menu.Item key="editProfile">编辑个人资料</Menu.Item>
-            <Menu.Item key="logout">退出登录</Menu.Item>
-        </Menu>
+            <button type="button" className="profile-trigger" aria-label="账户菜单">
+                <span className="profile-name">{name || '我的账号'}</span>
+                <span className="profile-avatar" aria-hidden="true">
+                    {name ? name.slice(0, 1).toUpperCase() : <UserOutlined />}
+                </span>
+                <DownOutlined className="profile-caret" />
+            </button>
+        </Dropdown>
     );
 };
 

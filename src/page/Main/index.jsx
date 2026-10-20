@@ -1,196 +1,140 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { App as AntApp } from 'antd';
 import {
-    UserOutlined,
-    PieChartOutlined,
+    BarChartOutlined,
+    CalendarOutlined,
     LineChartOutlined,
-    BarChartOutlined
+    PieChartOutlined,
 } from '@ant-design/icons';
-import {
-    Layout,
-    Menu,
-    Dropdown,
-    Avatar,
-    Space,
-    theme,
-    message
-} from 'antd';
+import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 
-import Target from "../../component/Target";
-import Conclusion from "../../component/Conclusion";
-import TargetItemContainer from "../../component/TargetItemContainer";
-import ProfileMenu from "../../component/ProfileMenu";
-import CustomFooter from "../../component/CustomFooter"
+import Brand from '../../component/Brand';
+import ProfileMenu from '../../component/ProfileMenu';
+import CustomFooter from '../../component/CustomFooter';
+import Target from '../../component/Target';
+import Conclusion from '../../component/Conclusion';
+import TargetItemContainer from '../../component/TargetItemContainer';
+import httpUtil from '../../util/HttpUtil';
 
-const { Content, Footer } = Layout;
+const TABS = [
+    {
+        key: 'today',
+        icon: <LineChartOutlined />,
+        label: '每日目标',
+        title: '每日目标',
+        sub: '勾选今天已经完成的事项，坚持会留下痕迹。',
+    },
+    {
+        key: 'targets',
+        icon: <BarChartOutlined />,
+        label: '目标',
+        title: '目标管理',
+        sub: '设定提醒频率，让你想坚持的事按时出现。',
+    },
+    {
+        key: 'summary',
+        icon: <PieChartOutlined />,
+        label: '总结',
+        title: '打卡总结',
+        sub: '回看每一天的完成情况，找到自己的节奏。',
+    },
+];
 
 const Main = () => {
-    const [selectedKey, setSelectedKey] = useState('1');
+    const [activeTab, setActiveTab] = useState('today');
+    const [userName, setUserName] = useState('');
     const navigate = useNavigate();
+    const { message } = AntApp.useApp();
 
-    const handleEditProfile = () => {
-        navigate('/editProfile');
-    };
+    useEffect(() => {
+        let active = true;
+        httpUtil
+            .getRequest('/user/userInfo')
+            .then((res) => {
+                if (active && res?.success) {
+                    setUserName(res.data?.name || '');
+                }
+            })
+            .catch(() => {
+                // 顶部昵称属于装饰信息，获取失败时静默降级
+            });
+        return () => {
+            active = false;
+        };
+    }, []);
 
     const handleLogout = () => {
-        message.info("logout");
-        localStorage.removeItem("authorization");
+        localStorage.removeItem('authorization');
+        message.success('已退出登录');
         navigate('/login');
     };
 
-    const {
-        token: { colorBgContainer, borderRadiusLG },
-    } = theme.useToken();
+    const currentTab = TABS.find((tab) => tab.key === activeTab) || TABS[0];
 
     const renderContent = () => {
-        switch (selectedKey) {
-            case '1':
-                return <TargetItemContainer />;
-            case '2':
+        switch (activeTab) {
+            case 'today':
+                return <TargetItemContainer onCreateTarget={() => setActiveTab('targets')} />;
+            case 'targets':
                 return <Target />;
-            case '3':
+            case 'summary':
                 return <Conclusion />;
             default:
                 return null;
         }
     };
 
-    const menuItems = [
-        {
-            key: '1',
-            icon: <LineChartOutlined />,
-            label: '每日目标',
-        },
-        {
-            key: '2',
-            icon: <BarChartOutlined />,
-            label: '目标',
-        },
-        {
-            key: '3',
-            icon: <PieChartOutlined />,
-            label: '总结',
-        }
-    ];
-
     return (
-        <>
-            <style jsx global>{`
-              .ant-menu-horizontal > .ant-menu-item-selected .ant-menu-overflow-item{
-                color: #000 !important;
-              }
-              .ant-menu-horizontal > .ant-menu-item-selected::after {
-                border-bottom-color: #000 !important;
-              }
-              .ant-menu-horizontal > .ant-menu-item:hover::after {
-                border-bottom-color: #000 !important;
-              }
-              .ant-menu-horizontal > .ant-menu-item:hover {
-                color: #000 !important;
-              }
-              .ant-menu-horizontal > .ant-menu-item-selected .anticon {
-                color: #000 !important;
-              }
-            `}</style>
+        <div className="app">
+            <header className="app-header">
+                <div className="app-header__inner">
+                    <Brand />
 
-            <Layout style={{ minHeight: '100vh' }}>
-                <Layout>
-                    <Layout.Header style={{
-                        background: '#fff',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                        padding: '0 24px',
-                        position: 'sticky',
-                        top: 0,
-                        zIndex: 100,
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        height: '80px',
-                    }}>
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            marginRight: 'auto',
-                        }}>
-                            <div style={{
-                                fontSize: '24px',
-                                fontWeight: 'bold',
-                                color: '#000',
-                                marginRight: '48px'
-                            }}>
-                                打卡小工具
-                            </div>
-                        </div>
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}>
-                            <Menu
-                                theme="light"
-                                mode="horizontal"
-                                defaultSelectedKeys={['1']}
-                                items={menuItems}
-                                onClick={({ key }) => setSelectedKey(key)}
-                                style={{
-                                    borderBottom: 'none',
-                                }}
-                                selectedKeys={[selectedKey]}
-                                onSelect={({ key }) => setSelectedKey(key)}
-                                defaultActiveFirst={false}
-                                itemIcon={({ icon, theme }) => (
-                                    <span style={{ fontSize: theme === 'filled' ? '18px' : '16px' }}>
-                                        {icon}
-                                    </span>
-                                )}
-                                itemLabelAttrs={({ selected }) => ({
-                                    style: {
-                                        fontSize: selected ? '18px' : '16px',
-                                        fontWeight: selected ? 'bold' : 'normal',
-                                    },
-                                })}
-                            />
-                        </div>
-                        <div style={{
-                            marginLeft: '24px',
-                        }}>
-                            <Dropdown overlay={<ProfileMenu onEdit={handleEditProfile} onLogout={handleLogout} />}
-                                      trigger={['click']}>
-                                <Space direction="horizontal">
-                                    <Avatar
-                                        size="large"
-                                        icon={<UserOutlined style={{ color: '#fff' }} />}
-                                        alt="Default User Avatar"
-                                        style={{
-                                            backgroundColor: '#000000',
-                                            color: '#ffffff'
-                                        }}
-                                    />
-                                </Space>
-                            </Dropdown>
-                        </div>
-                    </Layout.Header>
-                    <Content
-                        style={{
-                            margin: '24px 24px 0',
-                            minHeight: 'calc(100vh - 100px)',
-                        }}
-                    >
-                        <div
-                            style={{
-                                padding: 24,
-                                minHeight: 360,
-                                background: colorBgContainer,
-                                borderRadius: borderRadiusLG,
-                                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)'
-                            }}
-                        >
-                            {renderContent()}
-                        </div>
-                    </Content>
-                    <CustomFooter/>
-                </Layout>
-            </Layout>
-        </>
+                    <nav className="app-nav" aria-label="主导航">
+                        {TABS.map((tab) => (
+                            <button
+                                key={tab.key}
+                                type="button"
+                                className={`nav-pill${activeTab === tab.key ? ' is-active' : ''}`}
+                                aria-current={activeTab === tab.key ? 'page' : undefined}
+                                onClick={() => setActiveTab(tab.key)}
+                            >
+                                {tab.icon}
+                                <span className="nav-pill__label">{tab.label}</span>
+                            </button>
+                        ))}
+                    </nav>
+
+                    <div className="app-header__spacer" />
+
+                    <ProfileMenu
+                        name={userName}
+                        onEdit={() => navigate('/editProfile')}
+                        onLogout={handleLogout}
+                    />
+                </div>
+            </header>
+
+            <main className="app-main">
+                <div className="page-head">
+                    <div>
+                        <h1 className="page-title">{currentTab.title}</h1>
+                        <p className="page-sub">{currentTab.sub}</p>
+                    </div>
+                    <span className="page-date">
+                        <CalendarOutlined />
+                        {dayjs().format('M 月 D 日 dddd')}
+                    </span>
+                </div>
+
+                <div key={activeTab} className="rise">
+                    {renderContent()}
+                </div>
+            </main>
+
+            <CustomFooter />
+        </div>
     );
 };
 

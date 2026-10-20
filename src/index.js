@@ -1,13 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import {BrowserRouter} from 'react-router-dom';
-import App from "./App";
-const rootElement = document.getElementById('root');
-ReactDOM.createRoot(rootElement).render(
+import { BrowserRouter } from 'react-router-dom';
+import { App as AntApp, ConfigProvider } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
+import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
 
+import App from './App';
+import { themeConfig } from './theme';
+import './styles/global.css';
+
+dayjs.locale('zh-cn');
+
+const rootElement = document.getElementById('root');
+
+ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-        <BrowserRouter>
-            <App/>
-        </BrowserRouter>
+        <ConfigProvider locale={zhCN} theme={themeConfig}>
+            <AntApp>
+                <BrowserRouter>
+                    <App />
+                </BrowserRouter>
+            </AntApp>
+        </ConfigProvider>
     </React.StrictMode>
 );

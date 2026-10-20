@@ -1,349 +1,217 @@
-import { Button, Form, Input, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { App as AntApp, Button, Form, Input } from 'antd';
+import {
+    LockOutlined,
+    MailOutlined,
+    SafetyCertificateOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import AuthShell from '../../component/AuthShell';
 import httpUtil from '../../util/HttpUtil';
+import useCountdown from '../../util/useCountdown';
 
 const Register = () => {
     const [form] = Form.useForm();
-    const [isMessageInitialized, setMessageInitialized] = useState(false);
-    const [email, setEmail] = useState("");
-    const [code, setCode] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [name, setName] = useState("");
-
-    useEffect(() => {
-        console.log("password", password);
-        console.log("confirmPassword", confirmPassword);
-    }, [password, confirmPassword]);
-
-    const register = async () => {
-        const nameValue = name;
-        const emailValue = email;
-        const passwordValue = password;
-        const codeValue = code;
-
-        if (confirmPassword !== passwordValue) {
-            message.warning("密码不一致，请重新输入！");
-            setPassword("");
-            setConfirmPassword("");
-            form.setFieldsValue({ password: "", confirmPassword: "" });
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('name', nameValue);
-        formData.append('email', emailValue);
-        formData.append('password', passwordValue);
-        formData.append('code', codeValue);
-
-        try {
-            const data = await httpUtil.postRequest("/user/register", formData);
-
-            if (data.success) {
-                message.info("注册成功！");
-                navigate("/login");
-            } else {
-                message.error(data.message);
-            }
-        } catch (error) {
-            message.error("注册失败，请稍后再试。");
-        }
-    };
-
-    if (!isMessageInitialized) {
-        message.config({
-            maxCount: 1,
-        });
-        setMessageInitialized(true);
-    }
-
-    const updateEmailValue = (e) => {
-        setEmail(e.target.value);
-    };
-
-    const updateCode = (e) => {
-        setCode(e.target.value);
-    };
-
-    const updateNameValue = (e) => {
-        setName(e.target.value);
-    };
-
-    const updatePasswordValue = (e) => {
-        setPassword(e.target.value);
-    };
-
-    const updateConfirmPasswordValue = (e) => {
-        setConfirmPassword(e.target.value);
-    };
-
-    const isValidEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
+    const [loading, setLoading] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [countdown, setCountdown] = useCountdown();
+    const navigate = useNavigate();
+    const { message } = AntApp.useApp();
 
     const sendCode = async () => {
-        if (!isValidEmail(email)) {
-            message.error('请输入有效的邮箱地址');
+        try {
+            await form.validateFields(['email']);
+        } catch (error) {
             return;
         }
 
-        const data = await httpUtil.getRequest("/user/code?email=" + email);
-        if (data.success) {
-            message.info("验证码已发送至您的邮箱！");
-        } else {
-            message.info(data.message);
+        setSending(true);
+        try {
+            const email = form.getFieldValue('email');
+            const data = await httpUtil.getRequest(`/user/code?email=${encodeURIComponent(email)}`);
+            if (data.success) {
+                message.success('验证码已发送，请查收邮箱');
+                setCountdown(60);
+            } else {
+                message.warning(data.message || '验证码发送失败，请稍后再试');
+            }
+        } catch (error) {
+            message.error('网络异常，请稍后再试');
+        } finally {
+            setSending(false);
         }
     };
 
-    const navigate = useNavigate();
+    const onFinish = async (values) => {
+        setLoading(true);
+        const formData = new FormData();
+        formData.append('name', values.name);
+        formData.append('email', values.email);
+        formData.append('password', values.password);
+        formData.append('code', values.code);
 
-    const backToLogin = () => {
-        navigate("/login");
+        try {
+            const data = await httpUtil.postRequest('/user/register', formData);
+            if (data.success) {
+                message.success('注册成功，请登录');
+                navigate('/login');
+            } else {
+                message.error(data.message || '注册失败，请稍后再试');
+            }
+        } catch (error) {
+            message.error('注册失败，请稍后再试');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            minHeight: '100vh',
-            overflow: 'hidden',
-        }}>
-            {/* 左侧图片区域 */}
-            <div style={{
-                background: 'url(/static/images/registerLogo.jpg) no-repeat center center',
-                backgroundSize: 'cover',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                padding: '30px',
-                color: 'white',
-                position: 'relative',
-                minHeight: '100vh',
-            }}>
-                <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(0, 0, 0, 0.4)'
-                }} />
+        <AuthShell
+            image="/static/images/registerLogo.jpg"
+            quote={
+                <>
+                    想要规律地被提醒？
+                    <br />
+                    从今天的第一条目标开始。
+                </>
+            }
+            caption="START TODAY"
+        >
+            <h1 className="auth__title">创建账号</h1>
+            <p className="auth__sub">注册后即可创建目标，开始每日打卡</p>
 
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                    <h1 style={{ fontSize: '28px', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>打卡小工具</h1>
-                </div>
+            <Form
+                form={form}
+                name="register"
+                layout="vertical"
+                size="large"
+                requiredMark={false}
+                onFinish={onFinish}
+            >
+                <Form.Item
+                    name="name"
+                    label="用户名"
+                    rules={[
+                        { required: true, message: '请输入用户名' },
+                        { max: 30, message: '用户名最多 30 个字符' },
+                    ]}
+                >
+                    <Input
+                        prefix={<UserOutlined />}
+                        placeholder="你希望被怎么称呼"
+                        maxLength={30}
+                        autoComplete="nickname"
+                    />
+                </Form.Item>
 
-                <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 30px' }}>
-                    <h2 style={{ fontSize: '24px', marginBottom: '15px', textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)' }}>想要规律的被催促吗？</h2>
-                    <p style={{ fontSize: '16px', lineHeight: '1.5', textShadow: '1px 1px 3px rgba(0, 0, 0, 0.5)' }}>
-                        快来使用打卡小工具，轻松记录每日任务，培养良好习惯！
-                    </p>
-                </div>
+                <Form.Item
+                    name="email"
+                    label="邮箱"
+                    rules={[
+                        { required: true, message: '请输入邮箱' },
+                        { type: 'email', message: '请输入有效的邮箱地址' },
+                        { max: 30, message: '邮箱最多 30 个字符' },
+                    ]}
+                >
+                    <Input
+                        prefix={<MailOutlined />}
+                        placeholder="用于接收验证码"
+                        maxLength={30}
+                        autoComplete="email"
+                    />
+                </Form.Item>
 
-                <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center' }}>
-                    <div style={{ display: 'flex', gap: '15px' }}>
-                        <Button type="text" icon={<i className="fab fa-weixin"></i>} style={{ color: 'white', fontSize: '24px' }} />
-                        <Button type="text" icon={<i className="fab fa-weibo"></i>} style={{ color: 'white', fontSize: '24px' }} />
-                        <Button type="text" icon={<i className="fab fa-qq"></i>} style={{ color: 'white', fontSize: '24px' }} />
-                    </div>
-                </div>
-            </div>
-
-            {/* 右侧表单区域 */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                padding: '30px 50px',
-                minHeight: '100vh',
-                overflowY: 'auto',
-                backgroundColor: '#f5f5f5', // 浅灰色背景
-            }}>
-                <div style={{
-                    width: '100%',
-                    maxWidth: '400px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%',
-                    backgroundColor: '#fff', // 白色表单卡片
-                    padding: '30px',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                }}>
-                    <div style={{ marginBottom: '20px' }}>
-                        <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: 'bold', color: '#333' }}>创建新账号</h2>
-                        <p style={{ color: '#666' }}>
-                            已有账号？<a href="#" onClick={backToLogin} style={{ color: '#000' }}>立即登录</a>
-                        </p>
-                    </div>
-
-                    <Form
-                        name="basic"
-                        initialValues={{ remember: true }}
-                        form={form}
-                        layout="vertical"
-                        style={{ flex: 1 }}
-                    >
-                        <Form.Item
-                            label="用户名"
-                            name="name"
-                            rules={[
-                                { required: true, message: '请输入用户名' },
-                                { max: 29, message: '用户名已达到最大长度30个字符' }
-                            ]}
-                            onChange={updateNameValue}
-                        >
-                            <Input
-                                placeholder="请输入用户名"
-                                maxLength={30}
-                                style={{
-                                    width: '100%',
-                                    height: '40px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    padding: '0 12px',
-                                }}
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="邮箱"
-                            name="email"
-                            rules={[
-                                { required: true, message: '请输入邮箱地址' },
-                                { type: 'email', message: '请输入有效的邮箱地址' },
-                                { max: 29, message: '邮箱已达到最大长度30个字符' }
-                            ]}
-                            onChange={updateEmailValue}
-                        >
-                            <Input
-                                placeholder="请输入邮箱地址"
-                                maxLength={30}
-                                style={{
-                                    width: '100%',
-                                    height: '40px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    padding: '0 12px',
-                                }}
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="验证码"
-                            name="code"
-                            rules={[
-                                { required: true, message: '请输入验证码' },
-                                { max: 29, message: '验证码已达到最大长度30个字符' }
-                            ]}
-                            onChange={updateCode}
-                        >
-                            <Input
-                                placeholder="请输入验证码"
-                                maxLength={30}
-                                style={{
-                                    width: '100%',
-                                    height: '40px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    padding: '0 12px',
-                                }}
-                            />
-                        </Form.Item>
-
-                        <Form.Item>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <Button
-                                    type="primary"
-                                    onClick={sendCode}
-                                    style={{
-                                        backgroundColor: '#000', // 黑色按钮
-                                        borderColor: '#000',
-                                        height: '40px',
-                                        borderRadius: '4px',
-                                    }}
-                                >
-                                    获取验证码
-                                </Button>
-                            </div>
-                        </Form.Item>
-
-                        <Form.Item
-                            label="密码"
-                            name="password"
-                            rules={[
-                                { required: true, message: '请输入密码' },
-                                { min: 6, message: '密码长度至少为6位' },
-                                { max: 29, message: '密码已达到最大长度30个字符' }
-                            ]}
-                            onChange={updatePasswordValue}
-                        >
-                            <Input.Password
-                                placeholder="请输入密码"
-                                maxLength={30}
-                                style={{
-                                    width: '100%',
-                                    height: '40px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    padding: '0 12px',
-                                }}
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="确认密码"
-                            name="confirmPassword"
-                            rules={[
-                                { required: true, message: '请再次输入密码' },
-                                { max: 29, message: '确认密码已达到最大长度30个字符' },
-                                { validator: (_, value) => {
-                                        if (!value || value === password) {
-                                            return Promise.resolve();
-                                        }
-                                        return Promise.reject(new Error('两次输入的密码不一致'));
-                                    }
-                                }
-                            ]}
-                            onChange={updateConfirmPasswordValue}
-                        >
-                            <Input.Password
-                                placeholder="请再次输入密码"
-                                maxLength={30}
-                                style={{
-                                    width: '100%',
-                                    height: '40px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    padding: '0 12px',
-                                }}
-                            />
-                        </Form.Item>
-
-                        <Form.Item style={{ marginTop: 'auto' }}>
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                onClick={register}
-                                style={{
-                                    width: '100%',
-                                    height: '40px',
-                                    backgroundColor: '#000',
-                                    borderColor: '#000',
-                                    fontSize: '16px',
-                                    fontWeight: 'bold',
-                                    borderRadius: '4px',
-                                }}
+                <Form.Item
+                    name="code"
+                    label="邮箱验证码"
+                    rules={[{ required: true, message: '请输入验证码' }]}
+                >
+                    <Input
+                        prefix={<SafetyCertificateOutlined />}
+                        placeholder="输入邮件中的验证码"
+                        maxLength={30}
+                        suffix={
+                            <button
+                                type="button"
+                                className="code-btn"
+                                onClick={sendCode}
+                                disabled={sending || countdown > 0}
                             >
-                                立即注册
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </div>
-            </div>
-        </div>
+                                {countdown > 0
+                                    ? `${countdown}s 后重发`
+                                    : sending
+                                    ? '发送中…'
+                                    : '获取验证码'}
+                            </button>
+                        }
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    name="password"
+                    label="密码"
+                    rules={[
+                        { required: true, message: '请输入密码' },
+                        { min: 6, message: '密码长度至少为 6 位' },
+                        { max: 30, message: '密码最多 30 个字符' },
+                    ]}
+                >
+                    <Input.Password
+                        prefix={<LockOutlined />}
+                        placeholder="至少 6 位字符"
+                        maxLength={30}
+                        autoComplete="new-password"
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    name="confirmPassword"
+                    label="确认密码"
+                    dependencies={['password']}
+                    rules={[
+                        { required: true, message: '请再次输入密码' },
+                        ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                if (!value || getFieldValue('password') === value) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error('两次输入的密码不一致'));
+                            },
+                        }),
+                    ]}
+                >
+                    <Input.Password
+                        prefix={<LockOutlined />}
+                        placeholder="再次输入密码"
+                        maxLength={30}
+                        autoComplete="new-password"
+                    />
+                </Form.Item>
+
+                <Button
+                    className="auth__submit"
+                    type="primary"
+                    htmlType="submit"
+                    size="large"
+                    block
+                    loading={loading}
+                >
+                    立即注册
+                </Button>
+            </Form>
+
+            <p className="auth__foot">
+                已有账号？
+                <button
+                    type="button"
+                    className="auth-link auth-link--strong"
+                    onClick={() => navigate('/login')}
+                >
+                    直接登录
+                </button>
+            </p>
+        </AuthShell>
     );
 };
 

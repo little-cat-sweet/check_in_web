@@ -1,4 +1,3 @@
-
 export const getNowDate = async () => {
     const date = new Date();
     date.setHours(0, 0, 0, 0); // 设置时间为当天的 00:00:00.000
@@ -8,9 +7,10 @@ export const getNowDate = async () => {
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}T00:00:00.000Z`;
-}
+};
 
+const dateUtil = {
+    getNowDate,
+};
 
-export default {
-    getNowDate
-}
+export default dateUtil;

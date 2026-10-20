@@ -1,42 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import {
-    Form,
-    Input,
-    Button,
-    message,
-    Card,
-    Spin,
-    Row,
-    Col
-} from 'antd';
+import React, { useEffect, useState } from 'react';
+import { App as AntApp, Button, Form, Input, Skeleton } from 'antd';
+import { ArrowLeftOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import './index.css';
 import httpUtil from '../../util/HttpUtil';
 
 const EditProfile = () => {
     const navigate = useNavigate();
+    const { message } = AntApp.useApp();
     const [form] = Form.useForm();
+    const watchedName = Form.useWatch('name', form);
+
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
+        let active = true;
         const fetchUserInfo = async () => {
             try {
                 const response = await httpUtil.getRequest('/user/userInfo');
-                if (response.success) {
+                if (active && response.success) {
                     const { name, email } = response.data;
                     form.setFieldsValue({ name, email });
                 }
             } catch (error) {
-                message.error('加载用户信息失败');
+                if (active) {
+                    message.error('加载用户信息失败');
+                }
             } finally {
-                setLoading(false);
+                if (active) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchUserInfo();
-    }, [form]);
+        return () => {
+            active = false;
+        };
+    }, [form, message]);
 
     const onFinish = async (values) => {
+        setSaving(true);
         const formData = new FormData();
         formData.append('name', values.name);
         formData.append('email', values.email);
@@ -44,106 +48,94 @@ const EditProfile = () => {
         try {
             const response = await httpUtil.postRequest('/user/update', formData);
             if (response.success) {
-                message.success('资料更新成功');
-                navigate('/main')
+                message.success('资料已更新');
+                navigate('/main');
             } else {
                 message.error(response.message || '更新失败');
             }
         } catch (error) {
-            message.error('网络错误，请稍后再试');
+            message.error('网络异常，请稍后再试');
+        } finally {
+            setSaving(false);
         }
     };
 
-    if (loading) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <Spin tip="加载中..." size="large" />
-            </div>
-        );
-    }
+    const initial = (watchedName || '').trim().slice(0, 1).toUpperCase();
 
     return (
-        <div style={{
-            maxWidth: 600,
-            margin: 'auto',
-            padding: '24px',
-            backgroundColor: '#f8f8f8',
-            borderRadius: 8,
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            marginTop: '50px'
-        }}>
-            {/* 返回按钮居中 */}
-            <Row justify="start" align="middle" style={{ marginBottom: 16 }}>
-                <Col>
-                    <Button type="default" onClick={() => navigate(-1)}>
-                        ← 返回
-                    </Button>
-                </Col>
-            </Row>
+        <div className="profile-page">
+            <div className="profile-page__inner rise">
+                <button
+                    type="button"
+                    className="link-btn profile-page__back"
+                    onClick={() => navigate(-1)}
+                >
+                    <ArrowLeftOutlined /> 返回
+                </button>
 
-            <Card
-                title="编辑个人资料"
-                bordered={false}
-                style={{ textAlign: 'center', padding: '24px', borderRadius: 8, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}
-            >
-                {/* 表单容器设置最大宽度并居中 */}
-                <div style={{ maxWidth: 300, margin: '0 auto' }}>
-                    <Form
-                        form={form}
-                        layout="vertical"
-                        onFinish={onFinish}
-                        style={{ width: '100%' }}
-                    >
-                        <Form.Item
-                            label="用户名"
-                            name="name"
-                            rules={[
-                                { required: true, message: '请输入用户名' },
-                                { max: 29, message: '用户名已达到最大长度30个字符' }
-                            ]}
-                            labelCol={{ span: 24, style: { textAlign: 'left' } }}
-                            wrapperCol={{ span: 24 }}
-                        >
-                            <Input
-                                placeholder="请输入用户名"
-                                maxLength={30}
-                                style={{ borderRadius: 8 }}
-                            />
-                        </Form.Item>
+                <div className="card">
+                    <div className="profile-card__head">
+                        <span className="profile-card__avatar" aria-hidden="true">
+                            {initial || <UserOutlined />}
+                        </span>
+                        <div>
+                            <h1 className="profile-card__title">编辑个人资料</h1>
+                            <p className="card__sub">昵称会显示在主页右上角的账户菜单中</p>
+                        </div>
+                    </div>
 
-                        <Form.Item
-                            label="邮箱"
-                            name="email"
-                            rules={[
-                                { required: true },
-                                { type: 'email', message: '请输入有效的邮箱地址' },
-                                { max: 29, message: '邮箱已达到最大长度30个字符' }
-                            ]}
-                            labelCol={{ span: 24, style: { textAlign: 'left' } }}
-                            wrapperCol={{ span: 24 }}
-                        >
-                            <Input
-                                placeholder="请输入邮箱"
-                                disabled
-                                maxLength={30}
-                                style={{ borderRadius: 8 }}
-                            />
-                        </Form.Item>
-
-                        <Form.Item>
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                block
-                                className="black-button"
-                                style={{ borderRadius: 8 }}
+                    <div className="profile-card__body">
+                        {loading ? (
+                            <Skeleton active paragraph={{ rows: 4 }} />
+                        ) : (
+                            <Form
+                                form={form}
+                                layout="vertical"
+                                size="large"
+                                requiredMark={false}
+                                onFinish={onFinish}
                             >
-                                保存修改
-                            </Button>
-                        </Form.Item>
-                    </Form>
+                                <Form.Item
+                                    label="用户名"
+                                    name="name"
+                                    rules={[
+                                        { required: true, message: '请输入用户名' },
+                                        { max: 30, message: '用户名最多 30 个字符' },
+                                    ]}
+                                >
+                                    <Input
+                                        prefix={<UserOutlined />}
+                                        placeholder="请输入用户名"
+                                        maxLength={30}
+                                    />
+                                </Form.Item>
+
+                                <Form.Item
+                                    label="邮箱"
+                                    name="email"
+                                    extra="邮箱作为登录账号，暂不支持修改"
+                                    rules={[
+                                        { required: true, message: '请输入邮箱' },
+                                        { type: 'email', message: '请输入有效的邮箱地址' },
+                                    ]}
+                                >
+                                    <Input prefix={<MailOutlined />} disabled />
+                                </Form.Item>
+
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    size="large"
+                                    block
+                                    loading={saving}
+                                >
+                                    保存修改
+                                </Button>
+                            </Form>
+                        )}
+                    </div>
                 </div>
-            </Card>
+            </div>
         </div>
     );
 };
