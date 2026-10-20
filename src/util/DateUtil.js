@@ -1,4 +1,4 @@
-export const getNowDate = async () => {
+const getNowDate = async () => {
     const date = new Date();
     date.setHours(0, 0, 0, 0); // 设置时间为当天的 00:00:00.000
 

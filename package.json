@@ -7,9 +7,6 @@
     "antd": "^5.19.4",
     "axios": "^1.7.3",
     "dayjs": "^1.11.23",
-    "mobx": "^6.13.1",
-    "mobx-react-lite": "^4.0.7",
-    "nanoid": "^5.0.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0",
@@ -38,6 +35,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "http://118.24.185.140:8080"
+  }
 }

@@ -29,7 +29,6 @@
 | 构建 | Create React App（`react-scripts` 5） |
 | 路由 | react-router-dom 6（`useRoutes` + `lazy` 懒加载） |
 | UI 组件 | Ant Design 5、`@ant-design/icons` |
-| 状态管理 | MobX 6、`mobx-react-lite` |
 | HTTP | axios（统一封装拦截器） |
 | 日期处理 | dayjs（与 antd 内置版本一致，启用 `zh-cn` locale） |
 | 部署 | Docker 多阶段构建 + Nginx，GitHub Actions 自动发布 |
@@ -107,7 +106,6 @@ check_in_web/
 │  │  ├─ EditProfile/       编辑资料
 │  │  ├─ ProfileMenu/       账户下拉菜单
 │  │  └─ CustomFooter/      页脚
-│  ├─ store/                MobX store（RootStore + useStore）
 │  └─ util/
 │     ├─ HttpUtil.js        axios 实例与请求封装
 │     ├─ DateUtil.js        日期工具

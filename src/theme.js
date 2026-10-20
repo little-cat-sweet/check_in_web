@@ -98,4 +98,3 @@ export const themeConfig = {
     },
 };
 
-export default themeConfig;
