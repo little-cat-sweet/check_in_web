@@ -156,7 +156,7 @@ const Target = () => {
             render: (_, record) => (
                 <Popconfirm
                     title="删除这个目标？"
-                    description="删除后不可恢复，历史打卡记录不受影响。"
+                    description="删除后不可恢复 ！"
                     okText="删除"
                     cancelText="取消"
                     okButtonProps={{ danger: true, loading: deletingId === record.id }}
