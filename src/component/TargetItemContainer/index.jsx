@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons';
 import httpUtil from '../../util/HttpUtil';
 import dateUtil from '../../util/DateUtil';
+import AnimatedNumber from '../AnimatedNumber';
 
 const PAGE_SIZE = 20;
 
@@ -16,7 +17,25 @@ const TargetItemContainer = ({ onCreateTarget }) => {
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
-    const [pendingId, setPendingId] = useState(null);
+    const [pendingIds, setPendingIds] = useState(() => new Set());
+
+    const markPending = useCallback((id, pending) => {
+        setPendingIds((prev) => {
+            const next = new Set(prev);
+            if (pending) {
+                next.add(id);
+            } else {
+                next.delete(id);
+            }
+            return next;
+        });
+    }, []);
+
+    const applyStatus = useCallback((id, status) => {
+        setItems((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, status } : item))
+        );
+    }, []);
 
     const fetchItems = useCallback(
         async (pageNum) => {
@@ -46,29 +65,42 @@ const TargetItemContainer = ({ onCreateTarget }) => {
         fetchItems(page);
     }, [fetchItems, page]);
 
+    /**
+     * 勾选采用「乐观更新」：先改本地状态让进度条平滑过渡，再发请求；
+     * 失败时回滚。这里不重新拉取列表，避免 loading 期间顶部进度块被替换、列表变暗导致的跳动。
+     */
     const toggleStatus = async (item) => {
-        const isDone = item.status === 1;
-        setPendingId(item.id);
+        const wasDone = item.status === 1;
+        const nextStatus = wasDone ? 0 : 1;
+
+        if (pendingIds.has(item.id)) {
+            return;
+        }
+
+        markPending(item.id, true);
+        applyStatus(item.id, nextStatus);
+
         try {
-            const endpoint = isDone
+            const endpoint = wasDone
                 ? `/targetItem/cancel?id=${item.id}`
                 : `/targetItem/confirmSuccess?id=${item.id}`;
             const res = await httpUtil.postRequest(endpoint);
-            if (res.success) {
-                message.success(isDone ? '已撤销完成' : '已完成，继续保持');
-                await fetchItems(page);
+            if (!res.success) {
+                applyStatus(item.id, item.status);
+                message.error(res.message || (wasDone ? '撤销失败' : '标记失败'));
             } else {
-                message.error(res.message || (isDone ? '撤销失败' : '标记失败'));
+                message.success(wasDone ? '已撤销完成' : '已完成，继续保持');
             }
         } catch (error) {
+            applyStatus(item.id, item.status);
             message.error('操作失败，请稍后重试');
         } finally {
-            setPendingId(null);
+            markPending(item.id, false);
         }
     };
 
     const doneCount = items.filter((item) => item.status === 1).length;
-    const loadedAll = !loading && items.length === total;
+    const loadedAll = items.length === total;
     const percent = loadedAll && total > 0 ? Math.round((doneCount / total) * 100) : 0;
     const remaining = total - doneCount;
 
@@ -101,7 +133,7 @@ const TargetItemContainer = ({ onCreateTarget }) => {
                             <div className="summary__divider" />
                             <div className="summary__item">
                                 <span className="summary__value">
-                                    {doneCount}
+                                    <AnimatedNumber value={doneCount} />
                                     <small>/ {total}</small>
                                 </span>
                                 <span className="summary__label">已完成</span>
@@ -123,9 +155,14 @@ const TargetItemContainer = ({ onCreateTarget }) => {
                                     />
                                 </div>
                                 <span className="summary__hint">
-                                    {percent === 100
-                                        ? '今天的目标全部完成，做得很好 🎉'
-                                        : `完成度 ${percent}%，还差 ${remaining} 项`}
+                                    {percent === 100 ? (
+                                        '今天的目标全部完成，做得很好 🎉'
+                                    ) : (
+                                        <>
+                                            完成度 <AnimatedNumber value={percent} />%，还差{' '}
+                                            <AnimatedNumber value={remaining} /> 项
+                                        </>
+                                    )}
                                 </span>
                             </div>
                         </>
@@ -151,11 +188,12 @@ const TargetItemContainer = ({ onCreateTarget }) => {
                 <div className={`checklist${loading ? ' is-loading' : ''}`}>
                     {items.map((item) => {
                         const isDone = item.status === 1;
-                        const pending = pendingId === item.id;
+                        const pending = pendingIds.has(item.id);
                         return (
                             <div
                                 key={item.id}
                                 className={`check-row${isDone ? ' check-row--done' : ''}`}
+                                aria-busy={pending || undefined}
                             >
                                 <button
                                     type="button"

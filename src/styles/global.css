@@ -22,6 +22,7 @@
     --shadow-sm: 0 1px 2px rgba(23, 20, 15, 0.04), 0 1px 3px rgba(23, 20, 15, 0.03);
     --shadow-md: 0 2px 6px rgba(23, 20, 15, 0.05), 0 18px 40px -26px rgba(23, 20, 15, 0.35);
     --ease: cubic-bezier(0.22, 0.68, 0.32, 1);
+    --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ==========================================================================
@@ -458,6 +459,7 @@ a {
 .summary__hint {
     font-size: 12px;
     color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
 }
 
 .progress {
@@ -471,7 +473,7 @@ a {
     height: 100%;
     border-radius: 999px;
     background: linear-gradient(90deg, #1c1917, #57534e);
-    transition: width 0.6s var(--ease);
+    transition: width 0.52s var(--ease-soft), background 0.4s var(--ease-soft);
 }
 
 .progress__bar--complete {
@@ -486,7 +488,7 @@ a {
     flex-direction: column;
     gap: 2px;
     padding: 10px;
-    transition: opacity 0.2s var(--ease);
+    transition: opacity 0.25s var(--ease-soft);
 }
 
 .checklist.is-loading {
@@ -500,7 +502,7 @@ a {
     gap: 14px;
     padding: 12px 14px;
     border-radius: var(--radius-md);
-    transition: background 0.18s var(--ease);
+    transition: background 0.28s var(--ease-soft);
 }
 
 .check-row:hover {
@@ -520,7 +522,7 @@ a {
     color: transparent;
     font-size: 13px;
     cursor: pointer;
-    transition: all 0.18s var(--ease);
+    transition: all 0.3s var(--ease-soft);
 }
 
 .check-toggle:hover {
@@ -538,18 +540,18 @@ a {
     background: var(--success);
     border-color: var(--success);
     color: #fff;
-    animation: pop 0.3s var(--ease);
+    animation: pop 0.42s var(--ease-soft);
 }
 
+/* 轻微放大后柔和落位，不做夸张回弹 */
 @keyframes pop {
     0% {
-        transform: scale(0.82);
-    }
-    60% {
-        transform: scale(1.08);
+        transform: scale(0.9);
+        opacity: 0.72;
     }
     100% {
         transform: scale(1);
+        opacity: 1;
     }
 }
 
@@ -568,7 +570,7 @@ a {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    transition: color 0.18s var(--ease);
+    transition: color 0.38s var(--ease-soft);
 }
 
 .check-desc {
@@ -606,6 +608,7 @@ a {
     font-weight: 550;
     line-height: 1.6;
     white-space: nowrap;
+    transition: color 0.35s var(--ease-soft), background-color 0.35s var(--ease-soft);
 }
 
 .tag--done {
