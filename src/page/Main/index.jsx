@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { App as AntApp } from 'antd';
 import {
     BarChartOutlined,
+    BellOutlined,
     CalendarOutlined,
     LineChartOutlined,
     PieChartOutlined,
@@ -13,6 +14,7 @@ import Brand from '../../component/Brand';
 import ProfileMenu from '../../component/ProfileMenu';
 import CustomFooter from '../../component/CustomFooter';
 import Target from '../../component/Target';
+import Memo from '../../component/Memo';
 import Conclusion from '../../component/Conclusion';
 import TargetItemContainer from '../../component/TargetItemContainer';
 import httpUtil from '../../util/HttpUtil';
@@ -38,6 +40,13 @@ const TABS = [
         label: '总结',
         title: '打卡总结',
         sub: '回看每一天的完成情况，找到自己的节奏。',
+    },
+    {
+        key: 'memo',
+        icon: <BellOutlined />,
+        label: '备忘录',
+        title: '备忘录',
+        sub: '设置优先级与提醒间隔，到点用邮件提醒你，直到你处理为止。',
     },
 ];
 
@@ -80,6 +89,8 @@ const Main = () => {
                 return <Target />;
             case 'summary':
                 return <Conclusion />;
+            case 'memo':
+                return <Memo />;
             default:
                 return null;
         }
